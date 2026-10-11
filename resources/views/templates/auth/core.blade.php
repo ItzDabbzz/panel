@@ -1,6 +1,6 @@
 @extends('templates/wrapper', [
     'css' => [
-        'body' => 'bg-neutral-900',
+        'body' => 'bg-gray-950',
         'style' => 'background-image: var(--background); background-size: cover; background-position: center; background-attachment: fixed;',
     ],
 ])
