@@ -1,82 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import CodeMirror from 'codemirror';
+import { useEffect, useRef } from 'react';
+import { basicSetup } from 'codemirror';
+import { indentWithTab } from '@codemirror/commands';
+import { Compartment, EditorState, Prec } from '@codemirror/state';
+import { EditorView, keymap } from '@codemirror/view';
+import { indentUnit } from '@codemirror/language';
+import { languages } from '@codemirror/language-data';
 import modes from '@/modes';
 import styles from '@/reviactyl/elements/style.module.css';
-
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/theme/ayu-mirage.css';
-import 'codemirror/addon/edit/closebrackets';
-import 'codemirror/addon/edit/closetag';
-import 'codemirror/addon/edit/matchbrackets';
-import 'codemirror/addon/edit/matchtags';
-import 'codemirror/addon/edit/trailingspace';
-import 'codemirror/addon/fold/foldcode';
-import 'codemirror/addon/fold/foldgutter.css';
-import 'codemirror/addon/fold/foldgutter';
-import 'codemirror/addon/fold/brace-fold';
-import 'codemirror/addon/fold/comment-fold';
-import 'codemirror/addon/fold/indent-fold';
-import 'codemirror/addon/fold/markdown-fold';
-import 'codemirror/addon/fold/xml-fold';
-import 'codemirror/addon/hint/css-hint';
-import 'codemirror/addon/hint/html-hint';
-import 'codemirror/addon/hint/javascript-hint';
-import 'codemirror/addon/hint/show-hint.css';
-import 'codemirror/addon/hint/show-hint';
-import 'codemirror/addon/hint/sql-hint';
-import 'codemirror/addon/hint/xml-hint';
-import 'codemirror/addon/mode/simple';
-import 'codemirror/addon/dialog/dialog.css';
-import 'codemirror/addon/dialog/dialog';
-import 'codemirror/addon/scroll/annotatescrollbar';
-import 'codemirror/addon/scroll/scrollpastend';
-import 'codemirror/addon/scroll/simplescrollbars.css';
-import 'codemirror/addon/scroll/simplescrollbars';
-import 'codemirror/addon/search/jump-to-line';
-import 'codemirror/addon/search/match-highlighter';
-import 'codemirror/addon/search/matchesonscrollbar.css';
-import 'codemirror/addon/search/matchesonscrollbar';
-import 'codemirror/addon/search/search';
-import 'codemirror/addon/search/searchcursor';
-
-import 'codemirror/mode/brainfuck/brainfuck';
-import 'codemirror/mode/clike/clike';
-import 'codemirror/mode/css/css';
-import 'codemirror/mode/dart/dart';
-import 'codemirror/mode/diff/diff';
-import 'codemirror/mode/dockerfile/dockerfile';
-import 'codemirror/mode/erlang/erlang';
-import 'codemirror/mode/gfm/gfm';
-import 'codemirror/mode/go/go';
-import 'codemirror/mode/handlebars/handlebars';
-import 'codemirror/mode/htmlembedded/htmlembedded';
-import 'codemirror/mode/htmlmixed/htmlmixed';
-import 'codemirror/mode/http/http';
-import 'codemirror/mode/javascript/javascript';
-import 'codemirror/mode/jsx/jsx';
-import 'codemirror/mode/julia/julia';
-import 'codemirror/mode/lua/lua';
-import 'codemirror/mode/markdown/markdown';
-import 'codemirror/mode/nginx/nginx';
-import 'codemirror/mode/perl/perl';
-import 'codemirror/mode/php/php';
-import 'codemirror/mode/properties/properties';
-import 'codemirror/mode/protobuf/protobuf';
-import 'codemirror/mode/pug/pug';
-import 'codemirror/mode/python/python';
-import 'codemirror/mode/rpm/rpm';
-import 'codemirror/mode/ruby/ruby';
-import 'codemirror/mode/rust/rust';
-import 'codemirror/mode/sass/sass';
-import 'codemirror/mode/shell/shell';
-import 'codemirror/mode/smarty/smarty';
-import 'codemirror/mode/sql/sql';
-import 'codemirror/mode/swift/swift';
-import 'codemirror/mode/toml/toml';
-import 'codemirror/mode/twig/twig';
-import 'codemirror/mode/vue/vue';
-import 'codemirror/mode/xml/xml';
-import 'codemirror/mode/yaml/yaml';
 
 export interface Props {
     style?: React.CSSProperties;
@@ -117,78 +47,101 @@ const findModeByFilename = (filename: string) => {
 };
 
 export default ({ style, initialContent, filename, mode, fetchContent, onContentSaved, onModeChanged }: Props) => {
-    const [editor, setEditor] = useState<CodeMirror.Editor>();
+    const container = useRef<HTMLDivElement>(null);
+    const editor = useRef<EditorView | null>(null);
+    const language = useRef(new Compartment());
+    const save = useRef(onContentSaved);
+    save.current = onContentSaved;
 
-    const ref = useCallback<(_?: unknown) => void>((node) => {
-        if (!node) {
-            return;
-        }
+    useEffect(() => {
+        if (!container.current) return;
 
-        const e = CodeMirror.fromTextArea(node as HTMLTextAreaElement, {
-            mode: 'text/plain',
-            theme: 'ayu-mirage',
-            indentUnit: 4,
-            smartIndent: true,
-            tabSize: 4,
-            indentWithTabs: false,
-            lineWrapping: true,
-            lineNumbers: true,
-            fixedGutter: true,
-            scrollbarStyle: 'overlay',
-            coverGutterNextToScrollbar: false,
-            readOnly: false,
-            showCursorWhenSelecting: false,
-            autofocus: false,
-            spellcheck: true,
-            autocorrect: false,
-            autocapitalize: false,
-            lint: false,
-            autoCloseBrackets: true,
-            matchBrackets: true,
-            gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+        const view = new EditorView({
+            parent: container.current,
+            state: EditorState.create({
+                doc: initialContent || '',
+                extensions: [
+                    basicSetup,
+                    EditorView.lineWrapping,
+                    keymap.of([indentWithTab]),
+                    EditorView.contentAttributes.of({ spellcheck: 'true', autocorrect: 'off', autocapitalize: 'off' }),
+                    EditorState.tabSize.of(4),
+                    indentUnit.of('    '),
+                    language.current.of([]),
+                    Prec.highest(
+                        keymap.of([
+                            {
+                                key: 'Mod-s',
+                                run: () => {
+                                    save.current();
+                                    return true;
+                                },
+                            },
+                        ]),
+                    ),
+                    EditorView.theme(
+                        {
+                            '&': { height: '100%', backgroundColor: 'transparent', color: '#cbccc6' },
+                            '.cm-scroller': { overflow: 'auto', fontSize: '12px', lineHeight: '1.375rem' },
+                            '.cm-content': { caretColor: '#cbccc6' },
+                            '.cm-gutters': { backgroundColor: 'transparent', border: 'none', color: '#707a8c' },
+                        },
+                        { dark: true },
+                    ),
+                ],
+            }),
         });
+        editor.current = view;
 
-        setEditor(e);
-    }, []);
+        return () => {
+            editor.current = null;
+            view.destroy();
+        };
+    }, [initialContent]);
 
     useEffect(() => {
-        if (filename === undefined) {
-            return;
+        if (filename !== undefined) onModeChanged(findModeByFilename(filename)?.mime || 'text/plain');
+    }, [filename, onModeChanged]);
+
+    useEffect(() => {
+        const view = editor.current;
+        if (!view) return;
+
+        let cancelled = false;
+        const info = modes.find((item) => item.mime === mode || item.mimes?.includes(mode));
+        const aliases: Record<string, string> = {
+            'Git Markdown': 'Markdown',
+            Golang: 'Go',
+            MariaDB: 'MariaDB SQL',
+            Properties: 'Properties files',
+        };
+        const name = info && (aliases[info.name] || info.name);
+        const description = languages.find((item) => item.name.toLowerCase() === name?.toLowerCase());
+        view.dispatch({ effects: language.current.reconfigure([]) });
+        if (description) {
+            void description.load().then(
+                (support) => {
+                    if (!cancelled) view.dispatch({ effects: language.current.reconfigure(support) });
+                },
+                () => {
+                    // Keep editing as plain text if a language chunk cannot be loaded.
+                },
+            );
         }
 
-        onModeChanged(findModeByFilename(filename)?.mime || 'text/plain');
-    }, [filename]);
+        return () => {
+            cancelled = true;
+        };
+    }, [mode, initialContent]);
 
     useEffect(() => {
-        void (editor && editor.setOption('mode', mode));
-    }, [editor, mode]);
-
-    useEffect(() => {
-        if (editor) {
-            editor.setValue(initialContent || '');
-            // Reset the history so that "Ctrl+Z" doesn't delete the intial content
-            // we just set above.
-            editor.setHistory({ done: [], undone: [] });
-        }
-    }, [editor, initialContent]);
-
-    useEffect(() => {
-        if (!editor) {
-            fetchContent(() => Promise.reject(new Error('no editor session has been configured')));
-            return;
-        }
-
-        editor.addKeyMap({
-            'Ctrl-S': () => onContentSaved(),
-            'Cmd-S': () => onContentSaved(),
+        fetchContent(() => {
+            const view = editor.current;
+            return view
+                ? Promise.resolve(view.state.doc.toString())
+                : Promise.reject(new Error('no editor session has been configured'));
         });
+    }, [fetchContent]);
 
-        fetchContent(() => Promise.resolve(editor.getValue()));
-    }, [editor, fetchContent, onContentSaved]);
-
-    return (
-        <div className={styles.editor} style={style}>
-            <textarea ref={ref} />
-        </div>
-    );
+    return <div className={styles.editor} style={style} ref={container} />;
 };

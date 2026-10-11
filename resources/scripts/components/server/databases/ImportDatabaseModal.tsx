@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import type { DragEvent } from 'react';
 import { Form, Formik, FormikHelpers } from 'formik';
-import { boolean, object, string } from 'yup';
+import { createImportSchema } from './importValidation';
 import classNames from 'classnames';
 import { FaFileArrowUp, FaFileImport, FaFileLines, FaXmark } from 'react-icons/fa6';
 import { useTranslation } from 'react-i18next';
@@ -55,33 +55,7 @@ export default ({ database, visible, onDismissed, onImport }: Props) => {
     const [dragging, setDragging] = useState(false);
     const [progress, setProgress] = useState(0);
 
-    const schema = object().shape({
-        wipe: boolean(),
-        remote: boolean(),
-        host: string().when('remote', {
-            is: true,
-            then: string()
-                .required(t('import-remote-host-required'))
-                .matches(/^[\w\-.:[\]]+$/, t('import-remote-host-invalid')),
-        }),
-        port: string().when('remote', {
-            is: true,
-            then: string()
-                .required(t('import-remote-port-invalid'))
-                .test('port', t('import-remote-port-invalid'), (value) => {
-                    return /^\d{1,5}$/.test(value || '') && Number(value) >= 1 && Number(value) <= 65535;
-                }),
-        }),
-        database: string().when('remote', {
-            is: true,
-            then: string().required(t('import-remote-database-required')),
-        }),
-        username: string().when('remote', {
-            is: true,
-            then: string().required(t('import-remote-username-required')),
-        }),
-        password: string(),
-    });
+    const schema = createImportSchema(t);
 
     const selectFile = (selected?: File | null) => {
         if (!selected) return;
