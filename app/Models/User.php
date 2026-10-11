@@ -477,8 +477,19 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
             return $this->gravatar_url;
         }
 
+        $seed = $this->uuid;
+
+        if ($style === 'initials') {
+            $words = preg_split('/\s+/u', $this->name, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+            $initials = count($words) === 2
+                ? mb_substr($words[0], 0, 1).mb_substr($words[1], 0, 1)
+                : mb_substr(implode('', $words), 0, 2);
+
+            $seed = mb_strtoupper($initials) ?: $seed;
+        }
+
         $query = http_build_query(array_filter([
-            'seed' => $this->uuid,
+            'seed' => $seed,
             'animationVariant' => $this->avatar_animated && in_array($style, self::ANIMATED_AVATAR_STYLES, true)
                 ? 'medium'
                 : null,
