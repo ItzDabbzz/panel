@@ -104,6 +104,39 @@ class AccountControllerTest extends ClientApiIntegrationTestCase
         $this->assertSame($user->gravatar_url, $user->avatar_url);
     }
 
+    public function test_initials_avatar_seed_uses_the_name_only_for_initials(): void
+    {
+        $user = User::factory()->make(['uuid' => '00000000-0000-4000-8000-000000000001']);
+
+        foreach ([
+            ['John', 'Doe', 'JD'],
+            ['John', '', 'JO'],
+            ['John Michael', 'Doe', 'JO'],
+            ['John Michael', 'James Doe', 'JO'],
+            ['  john  ', "\t doe  ", 'JD'],
+            ['Élodie', 'Öberg', 'ÉÖ'],
+            ['李', '王', '李王'],
+            ['', '', $user->uuid],
+        ] as [$firstName, $lastName, $seed]) {
+            $user->name_first = $firstName;
+            $user->name_last = $lastName;
+            $user->avatar_style = 'initials';
+
+            $url = 'https://api.dicebear.com/10.x/initials/svg?'.http_build_query(['seed' => $seed]);
+            $this->assertSame($url, $user->avatar_url);
+            $this->assertSame($url, $user->getFilamentAvatarUrl());
+
+            foreach (array_diff(User::AVATAR_STYLES, ['initials', 'gravatar']) as $style) {
+                $user->avatar_style = $style;
+                parse_str(parse_url($user->avatar_url, PHP_URL_QUERY), $query);
+                $this->assertSame($user->uuid, $query['seed']);
+            }
+
+            $user->avatar_style = 'gravatar';
+            $this->assertSame($user->gravatar_url, $user->avatar_url);
+        }
+    }
+
     /**
      * Test that the user's email address can be updated via the API.
      */
