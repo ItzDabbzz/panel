@@ -165,6 +165,7 @@ return [
         'unresolvable' => ':host için adres bulunamadı.',
         'private_endpoint' => ':host özel veya ayrılmış bir adrese işaret ediyor. Kendi ağınız içindeki teslimatlara izin vermek için APP_WEBHOOK_ALLOW_PRIVATE=true ayarlayın.',
         'unreachable' => ':host adresine bağlanılamadı.',
+        'curl_required' => 'Bir ana makine adına teslimat için PHP cURL eklentisi gerekir, ancak bu eklenti yüklü değil.',
     ],
 
     'copy_suffix' => ':name (kopya)',

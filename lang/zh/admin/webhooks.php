@@ -165,6 +165,7 @@ return [
         'unresolvable' => '找不到 :host 的地址。',
         'private_endpoint' => ':host 指向私有或保留地址。设置 APP_WEBHOOK_ALLOW_PRIVATE=true 以允许向您自己的网络内投递。',
         'unreachable' => '无法连接到 :host 。',
+        'curl_required' => '向主机名投递需要 PHP cURL 扩展，但该扩展尚未安装。',
     ],
 
     'copy_suffix' => ':name（副本）',

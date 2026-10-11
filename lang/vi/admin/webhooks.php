@@ -165,6 +165,7 @@ return [
         'unresolvable' => 'Không tìm thấy địa chỉ của :host.',
         'private_endpoint' => ':host trỏ đến một địa chỉ riêng tư hoặc dành riêng. Đặt APP_WEBHOOK_ALLOW_PRIVATE=true để cho phép gửi trong mạng nội bộ của bạn.',
         'unreachable' => 'Không thể kết nối đến :host.',
+        'curl_required' => 'Gửi đến một tên máy chủ cần tiện ích mở rộng PHP cURL, nhưng tiện ích này chưa được cài đặt.',
     ],
 
     'copy_suffix' => ':name (bản sao)',

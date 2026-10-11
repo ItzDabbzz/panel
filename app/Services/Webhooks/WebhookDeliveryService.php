@@ -111,6 +111,10 @@ class WebhookDeliveryService
         $options = ['allow_redirects' => false];
 
         if ($target !== null && $target['host'] !== $target['address']) {
+            if (! extension_loaded('curl')) {
+                throw new WebhookEndpointException(trans('admin/webhooks.errors.curl_required'));
+            }
+
             $address = str_contains($target['address'], ':') ? '['.$target['address'].']' : $target['address'];
             $options['curl'] = [CURLOPT_RESOLVE => [$target['host'].':'.$target['port'].':'.$address]];
         }

@@ -165,6 +165,7 @@ return [
         'unresolvable' => ':host का पता नहीं मिल सका।',
         'private_endpoint' => ':host किसी निजी या आरक्षित पते की ओर इशारा करता है। अपने नेटवर्क के अंदर डिलीवरी की अनुमति देने के लिए APP_WEBHOOK_ALLOW_PRIVATE=true सेट करें।',
         'unreachable' => ':host से कनेक्ट नहीं हो सका।',
+        'curl_required' => 'होस्टनेम पर डिलीवरी के लिए PHP cURL एक्सटेंशन ज़रूरी है, जो इंस्टॉल नहीं है।',
     ],
 
     'copy_suffix' => ':name (प्रति)',

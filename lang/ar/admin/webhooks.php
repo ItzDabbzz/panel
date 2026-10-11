@@ -165,6 +165,7 @@ return [
         'unresolvable' => 'تعذّر العثور على عنوان :host.',
         'private_endpoint' => 'يشير :host إلى عنوان خاص أو محجوز. عيّن APP_WEBHOOK_ALLOW_PRIVATE=true للسماح بالتسليم داخل شبكتك.',
         'unreachable' => 'تعذّر الاتصال بـ :host.',
+        'curl_required' => 'يتطلب التسليم إلى اسم مضيف إضافة PHP cURL، وهي غير مثبتة.',
     ],
 
     'copy_suffix' => ':name (نسخة)',

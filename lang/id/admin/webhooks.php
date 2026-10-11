@@ -165,6 +165,7 @@ return [
         'unresolvable' => 'Alamat untuk :host tidak ditemukan.',
         'private_endpoint' => ':host mengarah ke alamat privat atau khusus. Atur APP_WEBHOOK_ALLOW_PRIVATE=true untuk mengizinkan pengiriman di dalam jaringan Anda sendiri.',
         'unreachable' => 'Tidak dapat terhubung ke :host.',
+        'curl_required' => 'Pengiriman ke nama host memerlukan ekstensi PHP cURL, yang belum terpasang.',
     ],
 
     'copy_suffix' => ':name (salinan)',

@@ -99,6 +99,15 @@ class WebhookDeliveryTest extends IntegrationTestCase
         Bus::assertDispatchedTimes(DeliverWebhook::class, 1);
         Bus::assertDispatched(DeliverWebhook::class, fn (DeliverWebhook $job) => $job->event === 'user:api-key.create'
             && $job->payload['data']['subjects'] === [['type' => 'user', 'id' => $user->id, 'name' => $user->username]]);
+
+        // A startup variable can be a password, so its values stay on the panel.
+        Webhook::factory()->create(['events' => ['server:startup.edit']]);
+        app(ActivityLogService::class)->actor($user)->event('server:startup.edit')
+            ->property(['variable' => 'RCON_PASSWORD', 'old' => 'hunter1', 'new' => 'hunter2'])
+            ->log();
+
+        Bus::assertDispatched(DeliverWebhook::class, fn (DeliverWebhook $job) => $job->event === 'server:startup.edit'
+            && $job->payload['data']['properties'] === ['variable' => 'RCON_PASSWORD']);
     }
 
     public function test_standard_webhook_is_signed_and_recorded(): void

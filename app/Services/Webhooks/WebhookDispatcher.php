@@ -9,12 +9,17 @@ use App\Models\Webhook;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class WebhookDispatcher
 {
     private const SENSITIVE_KEYS = ['password', 'secret', 'token', 'totp'];
+
+    private const SENSITIVE_PROPERTIES = [
+        'server:startup.edit' => ['old', 'new'],
+    ];
 
     public function model(string $action, Model $model): void
     {
@@ -68,7 +73,10 @@ class WebhookDispatcher
                     : ['type' => $subject->subject_type, 'id' => $subject->subject_id, 'name' => null])
                 ->values()
                 ->all(),
-            'properties' => $this->redact($activity->properties?->toArray() ?? []),
+            'properties' => $this->redact(Arr::except(
+                $activity->properties?->toArray() ?? [],
+                self::SENSITIVE_PROPERTIES[$activity->event] ?? [],
+            )),
         ], $activity->timestamp);
     }
 

@@ -165,6 +165,7 @@ return [
         'unresolvable' => 'L\'adresse de :host est introuvable.',
         'private_endpoint' => ':host pointe vers une adresse privée ou réservée. Définissez APP_WEBHOOK_ALLOW_PRIVATE=true pour autoriser les livraisons au sein de votre propre réseau.',
         'unreachable' => 'Connexion à :host impossible.',
+        'curl_required' => 'La livraison vers un nom d\'hôte nécessite l\'extension PHP cURL, qui n\'est pas installée.',
     ],
 
     'copy_suffix' => ':name (copie)',

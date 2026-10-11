@@ -165,6 +165,7 @@ return [
         'unresolvable' => ':host এর ঠিকানা খুঁজে পাওয়া যায়নি।',
         'private_endpoint' => ':host একটি প্রাইভেট বা সংরক্ষিত ঠিকানা নির্দেশ করে। নিজের নেটওয়ার্কের ভেতরে ডেলিভারির অনুমতি দিতে APP_WEBHOOK_ALLOW_PRIVATE=true সেট করুন।',
         'unreachable' => ':host এর সাথে সংযোগ করা যায়নি।',
+        'curl_required' => 'হোস্টনেমে ডেলিভারির জন্য PHP cURL এক্সটেনশন প্রয়োজন, যা ইনস্টল করা নেই।',
     ],
 
     'copy_suffix' => ':name (কপি)',

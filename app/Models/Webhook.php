@@ -50,6 +50,8 @@ class Webhook extends Model
 
     private const SUBSCRIPTIONS_CACHE_KEY = 'webhooks:subscriptions';
 
+    private const SUBSCRIPTIONS_CACHE_SECONDS = 60;
+
     protected $table = 'webhooks';
 
     protected $guarded = ['id', 'uuid', 'created_at', 'updated_at'];
@@ -126,7 +128,7 @@ class Webhook extends Model
      */
     public static function subscriptions(): array
     {
-        return Cache::rememberForever(self::SUBSCRIPTIONS_CACHE_KEY, function (): array {
+        return Cache::remember(self::SUBSCRIPTIONS_CACHE_KEY, self::SUBSCRIPTIONS_CACHE_SECONDS, function (): array {
             $subscriptions = [];
             foreach (static::query()->where('enabled', true)->get(['id', 'events']) as $webhook) {
                 foreach ($webhook->events ?? [] as $event) {

@@ -165,6 +165,7 @@ return [
         'unresolvable' => 'Adressen för :host kunde inte hittas.',
         'private_endpoint' => ':host pekar på en privat eller reserverad adress. Sätt APP_WEBHOOK_ALLOW_PRIVATE=true för att tillåta leveranser inom ditt eget nätverk.',
         'unreachable' => 'Kunde inte ansluta till :host.',
+        'curl_required' => 'Leverans till ett värdnamn kräver PHP-tillägget cURL, som inte är installerat.',
     ],
 
     'copy_suffix' => ':name (kopia)',
