@@ -36,6 +36,8 @@ class RolePermission
 
     public const RESOURCE_ALERTS = 'alerts';
 
+    public const RESOURCE_WEBHOOKS = 'webhooks';
+
     public const RESOURCE_EXTENSIONS = 'extensions';
 
     public const RESOURCE_ACTIVITY_LOG = 'activity_log';
@@ -86,6 +88,7 @@ class RolePermission
             self::RESOURCE_EGGS => self::CRUD,
             self::RESOURCE_MOUNTS => self::CRUD,
             self::RESOURCE_ALERTS => self::CRUD,
+            self::RESOURCE_WEBHOOKS => self::CRUD,
             self::RESOURCE_EXTENSIONS => [self::READ, self::UPDATE, self::DELETE],
             self::RESOURCE_ACTIVITY_LOG => [self::READ],
             self::RESOURCE_MONITORING => [self::READ],

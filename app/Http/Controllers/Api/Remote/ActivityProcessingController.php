@@ -9,6 +9,7 @@ use App\Models\ActivityLogSubject;
 use App\Models\Node;
 use App\Models\Server;
 use App\Models\User;
+use App\Services\Webhooks\WebhookDispatcher;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -16,6 +17,8 @@ use Webmozart\Assert\Assert;
 
 class ActivityProcessingController extends Controller
 {
+    public function __construct(private WebhookDispatcher $webhooks) {}
+
     public function __invoke(ActivityEventRequest $request)
     {
         $tz = Carbon::now()->getTimezone();
@@ -76,8 +79,13 @@ class ActivityProcessingController extends Controller
             Assert::isInstanceOf($server = $servers->get($key), Server::class);
 
             $batch = [];
+            $followed = [];
             foreach ($data as $datum) {
                 $id = ActivityLog::insertGetId($datum);
+                if ($this->webhooks->followsActivity($datum['event'])) {
+                    $followed[] = $id;
+                }
+
                 $batch[] = [
                     'activity_log_id' => $id,
                     'subject_id' => $server->id,
@@ -86,6 +94,8 @@ class ActivityProcessingController extends Controller
             }
 
             ActivityLogSubject::insert($batch);
+
+            rescue(fn () => ActivityLog::query()->findMany($followed)->each(fn (ActivityLog $log) => $this->webhooks->activity($log)));
         }
     }
 }

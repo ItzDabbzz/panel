@@ -9,6 +9,7 @@ use App\Exceptions\Model\DataValidationException;
 use App\Jobs\Administration\RefreshUserActivityLocationsJob;
 use App\Models\ActivityLog;
 use App\Models\SubuserPreviewSession;
+use App\Models\WebhookDelivery;
 use App\Repositories\Eloquent\SettingsRepository;
 use App\Services\Extensions\ExtensionManager;
 use App\Services\Telemetry\TelemetryCollectionService;
@@ -48,6 +49,10 @@ class Kernel extends ConsoleKernel
 
         if (config('activity.prune_days')) {
             $schedule->command(PruneCommand::class, ['--model' => [ActivityLog::class]])->daily();
+        }
+
+        if (config('webhooks.prune_days')) {
+            $schedule->command(PruneCommand::class, ['--model' => [WebhookDelivery::class]])->daily();
         }
 
         $schedule->command('server:capture-stats')->everyTenMinutes();
