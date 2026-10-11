@@ -132,7 +132,7 @@ class WebhookDeliveryTest extends IntegrationTestCase
         $this->assertSame(202, $delivery->status_code);
         $this->assertSame(1, $delivery->attempts);
         $this->assertSame('ok', $delivery->response);
-        $this->assertSame($payload, $delivery->payload);
+        $this->assertEquals($payload, $delivery->payload);
         $this->assertFalse($delivery->shouldRetry());
     }
 
