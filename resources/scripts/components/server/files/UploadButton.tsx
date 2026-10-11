@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ModalMask } from '@/reviactyl/elements/Modal';
 import Fade from '@/reviactyl/elements/Fade';
 import useEventListener from '@/plugins/useEventListener';
+import useFilePicker from '@/plugins/useFilePicker';
 import { useFlashKey } from '@/plugins/useFlash';
 import useFileManagerSwr from '@/plugins/useFileManagerSwr';
 import { ServerContext } from '@/state/server';
@@ -48,7 +49,7 @@ const normalizeRelativePath = (path: string): string =>
         .filter((part) => part && part !== '.' && part !== '..')
         .join('/');
 
-const filesFromList = (files: FileList, groupFolders = false): UploadFile[] =>
+const filesFromList = (files: FileList | File[], groupFolders = false): UploadFile[] =>
     Array.from(files).map((file) => {
         const path = normalizeRelativePath(file.webkitRelativePath || file.name);
 
@@ -211,6 +212,7 @@ export default ({ className }: WithClassname & { compact?: boolean }) => {
     const fileUploadInput = useRef<HTMLInputElement>(null);
     const folderUploadInput = useRef<HTMLInputElement>(null);
     const { t } = useTranslation('server/files');
+    const { t: pickerT } = useTranslation('generic');
 
     const [visible, setVisible] = useState(false);
     const visibleRef = useRef(false);
@@ -227,6 +229,7 @@ export default ({ className }: WithClassname & { compact?: boolean }) => {
     const { removeFileUpload, pushFileUpload, setUploadProgress } = ServerContext.useStoreActions(
         (actions) => actions.files,
     );
+    const picker = useFilePicker((files) => onFileSubmissionRef.current?.(filesFromList(files)), { multiple: true });
 
     useEventListener(
         'dragenter',
@@ -425,9 +428,21 @@ export default ({ className }: WithClassname & { compact?: boolean }) => {
                 uploadLabel={t('upload')}
                 filesLabel={t('upload-files')}
                 folderLabel={t('upload-folder')}
-                onFiles={() => fileUploadInput.current?.click()}
+                onFiles={() => picker.open(fileUploadInput.current)}
                 onFolder={() => folderUploadInput.current?.click()}
             />
+            {picker.error && (
+                <div role='alert' className='mt-2 text-sm text-red-200'>
+                    <p>{pickerT(`file-picker-${picker.error.stage}-error`)}</p>
+                    <button
+                        type='button'
+                        className='underline'
+                        onClick={() => picker.openStandard(fileUploadInput.current)}
+                    >
+                        {pickerT('file-picker-fallback')}
+                    </button>
+                </div>
+            )}
         </>
     );
 };

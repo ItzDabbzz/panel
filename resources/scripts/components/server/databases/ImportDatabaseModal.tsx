@@ -16,6 +16,7 @@ import importServerDatabase from '@/api/server/databases/importServerDatabase';
 import { httpErrorToHuman } from '@/api/http';
 import { bytesToString } from '@/lib/formatters';
 import useFlash from '@/plugins/useFlash';
+import useFilePicker from '@/plugins/useFilePicker';
 
 interface Props {
     database: ServerDatabase;
@@ -46,6 +47,7 @@ const initialValues: Values = {
 
 export default ({ database, visible, onDismissed, onImport }: Props) => {
     const { t } = useTranslation('server/databases');
+    const { t: pickerT } = useTranslation('generic');
     const uuid = ServerContext.useStoreState((state) => state.server.data!.uuid);
     const { addError, clearFlashes } = useFlash();
 
@@ -77,7 +79,23 @@ export default ({ database, visible, onDismissed, onImport }: Props) => {
         selectFile(e.dataTransfer.files[0]);
     };
 
+    const picker = useFilePicker((files) => selectFile(files[0]), {
+        multiple: false,
+        types: [
+            {
+                accept: {
+                    'application/sql': ['.sql'],
+                    'application/x-sql': ['.sql'],
+                    'application/gzip': ['.gz'],
+                    'application/x-gzip': ['.gz'],
+                    'application/zip': ['.zip'],
+                },
+            },
+        ],
+    });
+
     const reset = (resetForm: () => void) => {
+        picker.reset();
         resetForm();
         setFile(null);
         setFileError(null);
@@ -190,11 +208,11 @@ export default ({ database, visible, onDismissed, onImport }: Props) => {
                                               ? 'border-red-400/70 hover:border-red-300'
                                               : 'border-gray-700 hover:border-gray-500',
                                     )}
-                                    onClick={() => input.current?.click()}
+                                    onClick={() => picker.open(input.current)}
                                     onKeyDown={(e) => {
                                         if (e.key === 'Enter' || e.key === ' ') {
                                             e.preventDefault();
-                                            input.current?.click();
+                                            picker.open(input.current);
                                         }
                                     }}
                                     onDragOver={(e) => {
@@ -220,6 +238,18 @@ export default ({ database, visible, onDismissed, onImport }: Props) => {
                                 e.currentTarget.value = '';
                             }}
                         />
+                        {!values.remote && picker.error && (
+                            <div role='alert' className='mt-2 text-sm text-red-200'>
+                                <p>{pickerT(`file-picker-${picker.error.stage}-error`)}</p>
+                                <button
+                                    type='button'
+                                    className='underline'
+                                    onClick={() => picker.openStandard(input.current)}
+                                >
+                                    {pickerT('file-picker-fallback')}
+                                </button>
+                            </div>
+                        )}
                         <div
                             className={classNames(
                                 'rounded-ui border p-4 transition-colors duration-150',
