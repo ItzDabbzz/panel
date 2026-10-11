@@ -44,7 +44,11 @@ export default ({ ...props }: Props) => {
     const ref = useRef<HTMLInputElement>(null);
     const searchGeneration = useRef(0);
     const isAdmin = useStoreState(
-        (state) => state.user.data!.rootAdmin || state.user.data!.rolePermissions.includes('servers.read'),
+        (state) =>
+            state.user.data!.rootAdmin ||
+            state.user.data!.rolePermissions.some((permission) =>
+                ['servers.read', 'servers.update'].includes(permission),
+            ),
     );
     const [servers, setServers] = useState<Server[]>([]);
     const { clearAndAddHttpError, clearFlashes } = useStoreActions(

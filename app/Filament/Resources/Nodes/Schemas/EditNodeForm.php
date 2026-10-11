@@ -458,9 +458,12 @@ class EditNodeForm
                                     ->visible(fn ($record) => $record && $record->id),
                                 Section::make()
                                     ->description(trans('admin/node.sections.configuration.deploy_description'))
+                                    ->visible(fn (): bool => AdminAccess::isRoot())
                                     ->schema([
                                         Actions::make([
+                                            // The command embeds an application API key, which only works for root administrators.
                                             Action::make('generateToken')
+                                                ->authorize(fn (): bool => AdminAccess::isRoot())
                                                 ->label(trans('admin/node.deployment.generate_label'))
                                                 ->icon('heroicon-o-key')
                                                 ->color('success')

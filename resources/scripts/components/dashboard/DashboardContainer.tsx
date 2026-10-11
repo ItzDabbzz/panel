@@ -37,7 +37,11 @@ export default () => {
     const { clearFlashes, clearAndAddHttpError } = useFlash();
     const uuid = useStoreState((state) => state.user.data!.uuid);
     const accountRootAdmin = useStoreState(
-        (state) => state.user.data!.rootAdmin || state.user.data!.rolePermissions.includes('servers.read'),
+        (state) =>
+            state.user.data!.rootAdmin ||
+            state.user.data!.rolePermissions.some((permission) =>
+                ['servers.read', 'servers.update'].includes(permission),
+            ),
     );
     const layoutType = useStoreState((state) => state.designify.data!.layoutType);
     const { session } = useSubuserPreview();

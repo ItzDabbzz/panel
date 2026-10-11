@@ -165,6 +165,12 @@ class RolesTest extends IntegrationTestCase
         $this->assertTrue(UserResource::canEdit($regular));
         Livewire::test(EditUser::class, ['record' => $root->id])->assertForbidden();
 
+        $disposable = User::factory()->create();
+        Livewire::test(ListUsers::class)->callTableBulkAction('delete', [$root, $staff, $disposable]);
+        $this->assertModelExists($root);
+        $this->assertModelExists($staff);
+        $this->assertModelMissing($disposable);
+
         $grantable = Role::factory()->create(['permissions' => ['users.read']]);
         $beyond = Role::factory()->create(['permissions' => ['servers.delete']]);
 
