@@ -36,6 +36,9 @@ class GetUserPermissionsService
         /** @var Subuser|null $subuserPermissions */
         $subuserPermissions = $server->subusers()->where('user_id', $user->id)->first();
 
-        return $subuserPermissions ? $subuserPermissions->permissions : [];
+        return array_values(array_unique([
+            ...($subuserPermissions ? $subuserPermissions->permissions : []),
+            ...$user->roleServerPermissions(),
+        ]));
     }
 }

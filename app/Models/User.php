@@ -8,6 +8,7 @@ use App\Models\Traits\HasAccessTokens;
 use App\Models\Traits\HasRealtimeIdentifier;
 use App\Notifications\SendPasswordReset as ResetPasswordNotification;
 use App\Rules\Username;
+use App\Services\Acl\RolePermission;
 use App\Traits\Helpers\AvailableLanguages;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\HasAvatar;
@@ -18,6 +19,7 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Foundation\Auth\Access\Authorizable;
@@ -53,6 +55,7 @@ use Laravel\Passkeys\PasskeyAuthenticatable;
  * @property string $archive_format
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property \Illuminate\Database\Eloquent\Collection|Role[] $roles
  * @property \Illuminate\Database\Eloquent\Collection|ApiKey[] $apiKeys
  * @property int|null $api_keys_count
  * @property string $name
@@ -116,6 +119,15 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     public const USER_LEVEL_USER = 0;
 
     public const USER_LEVEL_ADMIN = 1;
+
+    protected static function booted(): void
+    {
+        static::saved(function (User $user) {
+            if ($user->wasRecentlyCreated ? $user->root_admin : $user->wasChanged('root_admin')) {
+                $user->syncRootRole();
+            }
+        });
+    }
 
     public function socialLogins(): HasMany
     {
@@ -240,8 +252,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      */
     public function toVueObject(): array
     {
-        return Collection::make($this->toArray())->except(['id', 'external_id'])
-            ->merge(['identifier' => $this->identifier])
+        return Collection::make($this->toArray())->except(['id', 'external_id', 'roles'])
+            ->merge(['identifier' => $this->identifier, 'admin' => $this->isAdmin(), 'permissions' => $this->rolePermissions()])
             ->toArray();
     }
 
@@ -321,6 +333,85 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         return $this->hasMany(ApiKey::class)
             ->where('key_type', ApiKey::TYPE_ACCOUNT);
+    }
+
+    /**
+     * Returns the roles this user holds. A root administrator always holds the
+     * built-in root role, which is kept in step with the root_admin flag.
+     *
+     * @return BelongsToMany<Role, $this>
+     */
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'role_user');
+    }
+
+    public function syncRootRole(): void
+    {
+        if ($this->root_admin) {
+            $this->roles()->syncWithoutDetaching([Role::root()->id]);
+        } else {
+            $this->roles()->detach(Role::query()->where('root', true)->pluck('id')->all());
+        }
+
+        $this->unsetRelation('roles');
+    }
+
+    /**
+     * Returns every permission this user has been granted across all of their roles.
+     *
+     * @return string[]
+     */
+    public function rolePermissions(): array
+    {
+        if ($this->root_admin) {
+            return RolePermission::all();
+        }
+
+        if (! $this->exists) {
+            return [];
+        }
+
+        return RolePermission::filter($this->roles->where('root', false)->pluck('permissions')->flatten()->all());
+    }
+
+    public function hasRolePermission(string $resource, string $action = RolePermission::READ): bool
+    {
+        return $this->root_admin || in_array(RolePermission::key($resource, $action), $this->rolePermissions(), true);
+    }
+
+    /**
+     * Returns the permissions the user's roles give them on every server in the client area:
+     * everything when they may edit servers, a read-only set when they may only view them.
+     *
+     * @return string[]
+     */
+    public function roleServerPermissions(): array
+    {
+        return RolePermission::serverPermissions($this->rolePermissions());
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->root_admin || $this->rolePermissions() !== [];
+    }
+
+    public function canManageUser(User $target): bool
+    {
+        if ($this->root_admin) {
+            return true;
+        }
+
+        return ! $target->root_admin && array_diff($target->rolePermissions(), $this->rolePermissions()) === [];
+    }
+
+    public function canGrantRole(Role $role): bool
+    {
+        if ($this->root_admin || $role->root) {
+            return $this->root_admin;
+        }
+
+        return array_diff($role->permissions, $this->rolePermissions()) === [];
     }
 
     /**

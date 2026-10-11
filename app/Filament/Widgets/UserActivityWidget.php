@@ -2,7 +2,9 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\AdminAccess;
 use App\Jobs\Administration\RefreshUserActivityLocationsJob;
+use App\Services\Acl\RolePermission;
 use BackedEnum;
 use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
@@ -12,6 +14,11 @@ use Illuminate\Support\Js;
 
 class UserActivityWidget extends ChartWidget
 {
+    public static function canView(): bool
+    {
+        return AdminAccess::allows(RolePermission::RESOURCE_USERS);
+    }
+
     protected int|string|array $columnSpan = 1;
 
     protected static ?int $sort = 4;

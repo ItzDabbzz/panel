@@ -2,6 +2,8 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\AdminAccess;
+use App\Services\Acl\RolePermission;
 use Filament\Actions\Action;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -17,6 +19,11 @@ use Throwable;
 
 class ExtensionsListWidget extends TableWidget
 {
+    public static function canView(): bool
+    {
+        return AdminAccess::allows(RolePermission::RESOURCE_EXTENSIONS);
+    }
+
     protected int|string|array $columnSpan = 'full';
 
     public function table(Table $table): Table

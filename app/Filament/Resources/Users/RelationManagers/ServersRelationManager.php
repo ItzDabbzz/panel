@@ -2,8 +2,12 @@
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
+use App\Filament\AdminAccess;
+use App\Filament\Concerns\AuthorizesAdminRelation;
+use App\Filament\Resources\Servers\ServerResource;
 use App\Helpers\StorageUnit;
 use App\Models\Server;
+use App\Services\Acl\RolePermission;
 use App\Services\Servers\ServerDeletionService;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -19,6 +23,10 @@ use Throwable;
 
 class ServersRelationManager extends RelationManager
 {
+    use AuthorizesAdminRelation;
+
+    protected static string $permissionResource = RolePermission::RESOURCE_SERVERS;
+
     protected static string $relationship = 'servers';
 
     protected static ?string $recordTitleAttribute = 'name';
@@ -123,11 +131,13 @@ class ServersRelationManager extends RelationManager
                 Action::make('edit')
                     ->label(trans('admin/server.actions.edit'))
                     ->icon('heroicon-o-pencil')
+                    ->visible(fn (Server $record): bool => ServerResource::canEdit($record))
                     ->url(fn (Server $record) => route('filament.admin.resources.servers.edit', ['record' => $record])),
 
                 Action::make('view')
                     ->label(trans('admin/server.actions.view'))
                     ->icon('heroicon-o-eye')
+                    ->visible(fn (): bool => AdminAccess::allows(RolePermission::RESOURCE_SERVERS))
                     ->url(fn (Server $record) => config('app.url').'/server/'.$record->uuid)
                     ->openUrlInNewTab(),
             ])

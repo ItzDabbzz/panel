@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Nests\Pages;
 
+use App\Filament\Resources\Nests\EggResource;
 use App\Filament\Resources\Nests\NestResource;
 use App\Models\Nest;
 use App\Services\Eggs\Sharing\EggImporterService;
@@ -24,6 +25,7 @@ class ListNests extends ListRecords
             CreateAction::make(),
             Action::make('import')
                 ->label(trans('admin/nests.actions.import'))
+                ->authorize(fn (): bool => EggResource::canCreate())
                 ->color('gray')
                 ->form([
                     FileUpload::make('file')

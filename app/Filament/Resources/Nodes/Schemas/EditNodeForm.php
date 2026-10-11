@@ -2,12 +2,14 @@
 
 namespace App\Filament\Resources\Nodes\Schemas;
 
+use App\Filament\AdminAccess;
 use App\Helpers\StorageUnit;
 use App\Models\ApiKey;
 use App\Models\Node;
 use App\Repositories\Agent\DaemonConfigurationRepository;
 use App\Repositories\Agent\DaemonMonitoringRepository;
 use App\Rules\NodeFqdn;
+use App\Services\Acl\RolePermission;
 use App\Services\Api\KeyCreationService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
@@ -249,6 +251,7 @@ class EditNodeForm
                                                 ->label(trans('admin/node.actions.view_monitoring'))
                                                 ->icon('heroicon-o-chart-bar')
                                                 ->color('primary')
+                                                ->visible(fn (): bool => AdminAccess::allows(RolePermission::RESOURCE_MONITORING))
                                                 ->url(fn ($record) => "/admin/monitoring?node={$record->id}")
                                                 ->openUrlInNewTab(false),
                                         ])

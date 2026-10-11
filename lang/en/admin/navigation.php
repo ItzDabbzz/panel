@@ -21,6 +21,7 @@ return [
         'databases' => 'Databases',
         'locations' => 'Locations',
         'nodes' => 'Nodes',
+        'roles' => 'Roles',
         'servers' => 'Servers',
         'users' => 'Users',
     ],

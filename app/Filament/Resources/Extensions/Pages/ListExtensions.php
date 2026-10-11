@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\Extensions\Pages;
 
+use App\Filament\AdminAccess;
 use App\Filament\Resources\Extensions\ExtensionResource;
 use App\Filament\Widgets\ExtensionsListWidget;
+use App\Services\Acl\RolePermission;
 use App\Services\Extensions\ExtensionManager;
 use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
@@ -23,6 +25,7 @@ class ListExtensions extends ListRecords
                 ->label(trans('admin/extensions.actions.upload'))
                 ->icon('heroicon-o-arrow-up-tray')
                 ->visible(fn (): bool => ! config('extensions.disable_upload', false))
+                ->authorize(fn (): bool => AdminAccess::allows(RolePermission::RESOURCE_EXTENSIONS, RolePermission::UPDATE))
                 ->form([
                     FileUpload::make('file')
                         ->label(trans('admin/extensions.columns.file'))

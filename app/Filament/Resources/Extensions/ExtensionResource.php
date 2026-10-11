@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\Extensions;
 
+use App\Filament\Concerns\AuthorizesAdminResource;
 use App\Filament\Resources\Extensions\Pages\ListExtensions;
 use App\Models\Extension;
+use App\Services\Acl\RolePermission;
 use App\Services\Extensions\ExtensionManager;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -16,6 +18,10 @@ use Filament\Tables\Table;
 
 class ExtensionResource extends Resource
 {
+    use AuthorizesAdminResource;
+
+    protected static string $permissionResource = RolePermission::RESOURCE_EXTENSIONS;
+
     protected static ?string $model = Extension::class;
 
     protected static ?int $navigationSort = 1;
@@ -95,6 +101,7 @@ class ExtensionResource extends Resource
                     ->icon('heroicon-o-check-circle')
                     ->label(trans('admin/extensions.actions.enable'))
                     ->visible(fn (Extension $record): bool => ! $record->enabled)
+                    ->authorize(fn (Extension $record): bool => static::canEdit($record))
                     ->action(function (Extension $record): void {
                         try {
                             app(ExtensionManager::class)->enable($record->identifier);
@@ -109,6 +116,7 @@ class ExtensionResource extends Resource
                     ->label(trans('admin/extensions.actions.disable'))
                     ->icon('heroicon-o-pause-circle')
                     ->visible(fn (Extension $record): bool => $record->enabled)
+                    ->authorize(fn (Extension $record): bool => static::canEdit($record))
                     ->action(function (Extension $record): void {
                         try {
                             app(ExtensionManager::class)->disable($record->identifier);

@@ -3,6 +3,7 @@
 namespace Tests\Unit\Services\Updates;
 
 use App\Filament\Pages\SoftwareUpdates;
+use App\Models\User;
 use App\Services\Updates\InstallationTypeService;
 use Tests\TestCase;
 
@@ -59,6 +60,8 @@ class InstallationTypeServiceTest extends TestCase
 
     public function test_software_update_page_is_only_visible_and_accessible_on_native_installations(): void
     {
+        $this->actingAs(User::factory()->make(['root_admin' => true]));
+
         config()->set('panel.installation_type', 'native');
         config()->set('app.version', 'canary');
         $this->assertTrue(SoftwareUpdates::shouldRegisterNavigation());

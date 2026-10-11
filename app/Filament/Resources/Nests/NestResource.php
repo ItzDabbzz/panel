@@ -3,7 +3,9 @@
 namespace App\Filament\Resources\Nests;
 
 use App\Filament\Components\ImageInput;
+use App\Filament\Concerns\AuthorizesAdminResource;
 use App\Models\Nest;
+use App\Services\Acl\RolePermission;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -20,6 +22,10 @@ use Illuminate\Support\Str;
 
 class NestResource extends Resource
 {
+    use AuthorizesAdminResource;
+
+    protected static string $permissionResource = RolePermission::RESOURCE_NESTS;
+
     protected static ?string $model = Nest::class;
 
     protected static ?int $navigationSort = 3;

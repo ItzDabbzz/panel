@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Users;
 
+use App\Filament\AdminAccess;
+use App\Filament\Concerns\AuthorizesAdminResource;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
@@ -9,12 +11,21 @@ use App\Filament\Resources\Users\RelationManagers\ServersRelationManager;
 use App\Filament\Resources\Users\Schemas\UserForm;
 use App\Filament\Resources\Users\Tables\UsersTable;
 use App\Models\User;
+use App\Services\Acl\RolePermission;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Auth\Access\Response;
+use Illuminate\Database\Eloquent\Model;
 
 class UserResource extends Resource
 {
+    use AuthorizesAdminResource {
+        getAuthorizationResponse as getPermissionAuthorizationResponse;
+    }
+
+    protected static string $permissionResource = RolePermission::RESOURCE_USERS;
+
     protected static ?string $model = User::class;
 
     protected static ?int $navigationSort = 5;
@@ -46,6 +57,25 @@ class UserResource extends Resource
     public static function getNavigationBadge(): ?string
     {
         return User::count() > 0 ? (string) User::count() : null;
+    }
+
+    /**
+     * An account can only be changed or removed by someone with at least as much
+     * access as it has, so a role holder can never take over a more powerful user.
+     */
+    public static function getAuthorizationResponse(string|\UnitEnum $action, ?Model $record = null): Response
+    {
+        $response = static::getPermissionAuthorizationResponse($action, $record);
+        if ($response->denied() || ! $record instanceof User) {
+            return $response;
+        }
+
+        if (in_array(AdminAccess::actionFor($action), [RolePermission::UPDATE, RolePermission::DELETE], true)
+            && ! AdminAccess::user()?->canManageUser($record)) {
+            return Response::deny();
+        }
+
+        return $response;
     }
 
     public static function form(Schema $schema): Schema

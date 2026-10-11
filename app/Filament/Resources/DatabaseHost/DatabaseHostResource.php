@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\DatabaseHost;
 
+use App\Filament\Concerns\AuthorizesAdminResource;
 use App\Models\DatabaseHost;
+use App\Services\Acl\RolePermission;
 use App\Services\Activity\ActivityLogService;
 use Filament\Actions;
 use Filament\Forms\Components\Select;
@@ -17,6 +19,10 @@ use Filament\Tables\Table;
 
 class DatabaseHostResource extends Resource
 {
+    use AuthorizesAdminResource;
+
+    protected static string $permissionResource = RolePermission::RESOURCE_DATABASE_HOSTS;
+
     protected static ?string $model = DatabaseHost::class;
 
     protected static ?int $navigationSort = 1;
@@ -156,12 +162,14 @@ class DatabaseHostResource extends Resource
                 Actions\Action::make('edit')
                     ->label(trans('admin/databases.actions.edit'))
                     ->icon('heroicon-o-pencil')
+                    ->visible(fn (DatabaseHost $record): bool => static::canEdit($record))
                     ->url(fn (DatabaseHost $record): string => static::getUrl('edit', ['record' => $record->getKey()])),
 
                 Actions\Action::make('delete')
                     ->label(trans('admin/databases.actions.delete'))
                     ->icon('heroicon-o-trash')
                     ->color('danger')
+                    ->authorize(fn (DatabaseHost $record): bool => static::canDelete($record))
                     ->requiresConfirmation()
                     ->action(function (DatabaseHost $record, Actions\Action $action) {
                         if ($record->databases()->count() > 0) {

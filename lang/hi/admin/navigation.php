@@ -20,6 +20,7 @@ return [
         'databases' => 'डेटाबेस',
         'locations' => 'स्थानों',
         'nodes' => 'नोड्स',
+        'roles' => 'भूमिकाएँ',
         'servers' => 'सर्वर',
         'users' => 'उपयोगकर्ताओं',
     ],

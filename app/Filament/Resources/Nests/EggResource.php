@@ -3,10 +3,12 @@
 namespace App\Filament\Resources\Nests;
 
 use App\Filament\Components\ImageInput;
+use App\Filament\Concerns\AuthorizesAdminResource;
 use App\Filament\Resources\Nests\Eggs\Pages;
 use App\Models\Egg;
 use App\Rules\EggVariableDefaultValue;
 use App\Rules\EggVariableRules;
+use App\Services\Acl\RolePermission;
 use App\Services\Eggs\Sharing\EggExporterService;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -26,6 +28,10 @@ use Filament\Tables\Table;
 
 class EggResource extends Resource
 {
+    use AuthorizesAdminResource;
+
+    protected static string $permissionResource = RolePermission::RESOURCE_EGGS;
+
     protected static ?string $model = Egg::class;
 
     protected static ?string $slug = 'nests/egg';

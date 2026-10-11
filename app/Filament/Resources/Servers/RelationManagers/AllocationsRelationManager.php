@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\Servers\RelationManagers;
 
+use App\Filament\Concerns\AuthorizesAdminRelation;
 use App\Models\Allocation;
 use App\Models\Server;
+use App\Services\Acl\RolePermission;
 use App\Services\Servers\BuildModificationService;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -16,6 +18,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class AllocationsRelationManager extends RelationManager
 {
+    use AuthorizesAdminRelation;
+
+    protected static string $permissionResource = RolePermission::RESOURCE_SERVERS;
+
+    protected static function changesOwner(): bool
+    {
+        return true;
+    }
+
     protected static string $relationship = 'allocations';
 
     public function table(Table $table): Table
@@ -35,6 +46,7 @@ class AllocationsRelationManager extends RelationManager
                 TextInputColumn::make('ip_alias')
                     ->label(trans('admin/server.allocations.table.alias'))
                     ->placeholder(trans('admin/server.allocations.placeholder.no_alias_assigned'))
+                    ->disabled(fn (): bool => ! static::allows(RolePermission::UPDATE))
                     ->toggleable(),
 
                 IconColumn::make('primary')
@@ -49,6 +61,7 @@ class AllocationsRelationManager extends RelationManager
 
                 TextInputColumn::make('notes')
                     ->label(trans('admin/server.allocations.table.notes'))
+                    ->disabled(fn (): bool => ! static::allows(RolePermission::UPDATE))
                     ->toggleable(),
 
                 TextColumn::make('created_at')
@@ -61,6 +74,7 @@ class AllocationsRelationManager extends RelationManager
                     ->label(trans('admin/server.allocations.actions.make_primary'))
                     ->icon('heroicon-o-star')
                     ->color('primary')
+                    ->authorize(fn (): bool => static::allows(RolePermission::UPDATE))
                     ->visible(function (Allocation $record): bool {
                         /** @var Server $owner */
                         $owner = $this->getOwnerRecord();

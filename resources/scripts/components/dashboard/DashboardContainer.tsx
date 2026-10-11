@@ -36,7 +36,9 @@ export default () => {
     const [page, setPage] = useState(!isNaN(defaultPage) && defaultPage > 0 ? defaultPage : 1);
     const { clearFlashes, clearAndAddHttpError } = useFlash();
     const uuid = useStoreState((state) => state.user.data!.uuid);
-    const accountRootAdmin = useStoreState((state) => state.user.data!.rootAdmin);
+    const accountRootAdmin = useStoreState(
+        (state) => state.user.data!.rootAdmin || state.user.data!.rolePermissions.includes('servers.read'),
+    );
     const layoutType = useStoreState((state) => state.designify.data!.layoutType);
     const { session } = useSubuserPreview();
     const rootAdmin = accountRootAdmin && !session;

@@ -20,6 +20,7 @@ return [
         'databases' => 'Cơ sở dữ liệu',
         'locations' => 'Địa điểm',
         'nodes' => 'Nút',
+        'roles' => 'Vai trò',
         'servers' => 'Máy chủ',
         'users' => 'Người dùng',
     ],

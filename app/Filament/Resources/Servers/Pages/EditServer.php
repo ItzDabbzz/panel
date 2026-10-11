@@ -2,12 +2,14 @@
 
 namespace App\Filament\Resources\Servers\Pages;
 
+use App\Filament\AdminAccess;
 use App\Filament\Resources\Servers\Schemas\EditServerForm;
 use App\Filament\Resources\Servers\ServerResource;
 use App\Models\Egg;
 use App\Models\Server;
 use App\Models\User;
 use App\Repositories\Eloquent\ServerRepository;
+use App\Services\Acl\RolePermission;
 use App\Services\Activity\ActivityLogService;
 use App\Services\Servers\BuildModificationService;
 use App\Services\Servers\DetailsModificationService;
@@ -128,6 +130,7 @@ class EditServer extends EditRecord
             Action::make('open_panel')
                 ->label(trans('admin/server.actions.view'))
                 ->icon('heroicon-o-arrow-top-right-on-square')
+                ->visible(fn (): bool => AdminAccess::allows(RolePermission::RESOURCE_SERVERS))
                 ->url(function (): string {
                     /** @var Server $server */
                     $server = $this->record;
@@ -191,6 +194,7 @@ class EditServer extends EditRecord
                 ->label(trans('admin/server.actions.delete'))
                 ->icon('heroicon-o-trash')
                 ->color('danger')
+                ->authorize(fn (): bool => static::getResource()::canDelete($this->getRecord()))
                 ->requiresConfirmation()
                 ->action(fn () => $this->deleteServer(force: false))
                 ->successNotification(null),
@@ -199,6 +203,7 @@ class EditServer extends EditRecord
                 ->label(trans('admin/server.actions.delete_forcibly'))
                 ->icon('heroicon-o-fire')
                 ->color('danger')
+                ->authorize(fn (): bool => static::getResource()::canDelete($this->getRecord()))
                 ->requiresConfirmation()
                 ->action(fn () => $this->deleteServer(force: true))
                 ->successNotification(null),

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Servers;
 
+use App\Filament\Concerns\AuthorizesAdminResource;
 use App\Filament\Resources\Servers\Pages\CreateServer;
 use App\Filament\Resources\Servers\Pages\EditServer;
 use App\Filament\Resources\Servers\Pages\ListServers;
@@ -11,6 +12,7 @@ use App\Filament\Resources\Servers\RelationManagers\MountsRelationManager;
 use App\Filament\Resources\Servers\Schemas\EditServerForm;
 use App\Filament\Resources\Servers\Tables\ServersTable;
 use App\Models\Server;
+use App\Services\Acl\RolePermission;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -18,6 +20,10 @@ use Filament\Tables\Table;
 
 class ServerResource extends Resource
 {
+    use AuthorizesAdminResource;
+
+    protected static string $permissionResource = RolePermission::RESOURCE_SERVERS;
+
     protected static ?string $model = Server::class;
 
     protected static ?int $navigationSort = 4;

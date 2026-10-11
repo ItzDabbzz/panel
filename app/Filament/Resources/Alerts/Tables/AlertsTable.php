@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Alerts\Tables;
 
+use App\Filament\Resources\Alerts\AlertResource;
 use App\Models\Alert;
 use App\Services\Activity\ActivityLogService;
 use App\Services\Alerts\AlertVisibilityService;
@@ -74,7 +75,8 @@ class AlertsTable
                     ->formatStateUsing(fn (string $state): string => trans("admin/alerts.placements.$state")),
 
                 ToggleColumn::make('enabled')
-                    ->label(trans('admin/alerts.columns.enabled')),
+                    ->label(trans('admin/alerts.columns.enabled'))
+                    ->disabled(fn (Alert $record): bool => ! AlertResource::canEdit($record)),
 
                 TextColumn::make('dismissals_count')
                     ->label(trans('admin/alerts.columns.dismissals'))
@@ -124,6 +126,7 @@ class AlertsTable
                         ->requiresConfirmation()
                         ->modalDescription(trans('admin/alerts.actions.reset_dismissals_description'))
                         ->visible(fn (Alert $record): bool => $record->dismissible || $record->hidesAfterAction())
+                        ->authorize(fn (Alert $record): bool => AlertResource::canEdit($record))
                         ->action(function (Alert $record): void {
                             app(AlertVisibilityService::class)->resetDismissals($record);
 

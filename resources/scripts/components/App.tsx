@@ -30,6 +30,8 @@ interface ExtendedWindow extends Window {
         name_last: string;
         email: string;
         root_admin: boolean;
+        admin?: boolean;
+        permissions?: string[];
         use_totp: boolean;
         language: string;
         editor: string;
@@ -153,6 +155,8 @@ function App() {
             email: PanelUser.email,
             language: PanelUser.language,
             rootAdmin: PanelUser.root_admin,
+            adminAccess: PanelUser.admin ?? PanelUser.root_admin,
+            rolePermissions: PanelUser.permissions ?? [],
             useTotp: PanelUser.use_totp,
             createdAt: new Date(PanelUser.created_at),
             fileEditor: PanelUser.editor,

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Api;
 
+use App\Filament\AdminAccess;
 use App\Filament\Resources\Api\Pages\CreateApiKey;
 use App\Filament\Resources\Api\Pages\ListApiKeys;
 use App\Models\ApiKey;
@@ -15,12 +16,23 @@ use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class ApiKeyResource extends Resource
 {
     protected static ?string $model = ApiKey::class;
+
+    /**
+     * Application API keys carry their own access list that is independent of admin
+     * roles, so managing them is reserved for root administrators.
+     */
+    public static function getAuthorizationResponse(string|\UnitEnum $action, ?Model $record = null): Response
+    {
+        return AdminAccess::isRoot() ? Response::allow() : Response::deny();
+    }
 
     protected static string|\BackedEnum|null $navigationIcon = 'tabler-key';
 
@@ -141,6 +153,7 @@ class ApiKeyResource extends Resource
                     ->label(trans('admin/api.revoke'))
                     ->icon('heroicon-o-trash')
                     ->color('danger')
+                    ->authorize(fn (): bool => AdminAccess::isRoot())
                     ->requiresConfirmation()
                     ->modalHeading(trans('admin/api.revoke-title'))
                     ->modalDescription(trans('admin/api.revoke-warning'))

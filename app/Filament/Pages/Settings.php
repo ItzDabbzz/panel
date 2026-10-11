@@ -3,9 +3,11 @@
 namespace App\Filament\Pages;
 
 use App\Contracts\Repository\SettingsRepositoryInterface;
+use App\Filament\AdminAccess;
 use App\Filament\Components\Alert;
 use App\Filament\Components\ImageInput;
 use App\Notifications\MailTested;
+use App\Services\Acl\RolePermission;
 use App\Traits\Helpers\AvailableLanguages;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
@@ -36,6 +38,11 @@ class Settings extends Page implements HasSchemas
     use AvailableLanguages;
     use InteractsWithForms;
     use InteractsWithHeaderActions;
+
+    public static function canAccess(): bool
+    {
+        return AdminAccess::allows(RolePermission::RESOURCE_SETTINGS, RolePermission::UPDATE);
+    }
 
     protected static string|\BackedEnum|null $navigationIcon = 'tabler-settings';
 

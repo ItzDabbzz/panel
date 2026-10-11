@@ -20,6 +20,7 @@ return [
         'databases' => 'Veritabanları',
         'locations' => 'Konumlar',
         'nodes' => 'Düğümler',
+        'roles' => 'Roller',
         'servers' => 'Sunucular',
         'users' => 'Kullanıcılar',
     ],
