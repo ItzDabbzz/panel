@@ -6,7 +6,7 @@ import createOrUpdateScheduleTask from '@/api/server/schedules/createOrUpdateSch
 import { httpErrorToHuman } from '@/api/http';
 import Field from '@/reviactyl/elements/Field';
 import FlashMessageRender from '@/components/FlashMessageRender';
-import { boolean, number, object, string } from 'yup';
+import { taskSchema } from './taskValidation';
 import useFlash from '@/plugins/useFlash';
 import FormikFieldWrapper from '@/reviactyl/elements/FormikFieldWrapper';
 import Label from '@/reviactyl/elements/Label';
@@ -32,21 +32,6 @@ interface Values {
     timeOffset: string;
     continueOnFailure: boolean;
 }
-
-const schema = object().shape({
-    action: string().required().oneOf(['command', 'power', 'backup']),
-    payload: string().when('action', {
-        is: (v) => v !== 'backup',
-        then: string().required('A task payload must be provided.'),
-        otherwise: string(),
-    }),
-    continueOnFailure: boolean(),
-    timeOffset: number()
-        .typeError('The time offset must be a valid number between 0 and 900.')
-        .required('A time offset value must be provided.')
-        .min(0, 'The time offset must be at least 0 seconds.')
-        .max(900, 'The time offset must be less than 900 seconds.'),
-});
 
 const ActionListener = ({ defaultPowerAction }: { defaultPowerAction: string }) => {
     const [{ value }, { initialValue: initialAction }] = useField<string>('action');
@@ -128,7 +113,7 @@ const TaskDetailsModal = ({ schedule, task }: Props) => {
     return (
         <Formik
             onSubmit={submit}
-            validationSchema={schema}
+            validationSchema={taskSchema}
             initialValues={{
                 action: initialAction,
                 payload: initialPayload,
