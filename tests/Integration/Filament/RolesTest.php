@@ -11,6 +11,7 @@ use App\Filament\Resources\Roles\Pages\EditRole;
 use App\Filament\Resources\Roles\RoleResource;
 use App\Filament\Resources\Servers\ServerResource;
 use App\Filament\Resources\Users\Pages\EditUser;
+use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Filament\Resources\Users\Schemas\UserForm;
 use App\Filament\Resources\Users\UserResource;
 use App\Models\Location;
@@ -143,6 +144,11 @@ class RolesTest extends IntegrationTestCase
         $this->assertTrue($user->roles()->where('root', true)->exists());
 
         Livewire::test(EditUser::class, ['record' => $root->id])->assertFormFieldDisabled(UserForm::ROLES_FIELD);
+
+        Livewire::test(ListUsers::class)
+            ->filterTable('roles', [$role->id])
+            ->assertCanSeeTableRecords([$root, $user])
+            ->assertCanNotSeeTableRecords([User::factory()->create()]);
     }
 
     public function test_role_holder_cannot_manage_more_powerful_accounts(): void

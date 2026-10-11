@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
+use App\Models\Role;
 use App\Models\User;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -52,9 +53,15 @@ class UsersTable
             ->filters([
                 SelectFilter::make('roles')
                     ->label(trans('admin/roles.plural-label'))
-                    ->relationship('roles', 'name')
+                    ->options(fn (): array => Role::query()->orderByDesc('root')->orderBy('name')->pluck('name', 'id')->all())
                     ->multiple()
-                    ->preload(),
+                    ->query(fn (Builder $query, array $data): Builder => $query->when(
+                        $data['values'] ?? [],
+                        fn (Builder $query, array $roles): Builder => $query->whereHas(
+                            'roles',
+                            fn (Builder $query): Builder => $query->whereIn('roles.id', $roles),
+                        ),
+                    )),
             ])
             ->recordActions([
                 EditAction::make(),
