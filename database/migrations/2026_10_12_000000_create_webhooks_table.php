@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('type', 32)->default('standard');
             $table->text('endpoint');
             $table->text('secret')->nullable();
-            $table->json('headers')->nullable();
+            $table->text('headers')->nullable();
             $table->json('events');
             $table->json('message')->nullable();
             $table->timestamps();
