@@ -3,10 +3,13 @@
 namespace App\Filament\Resources\Users\Schemas;
 
 use App\Contracts\Repository\SettingsRepositoryInterface;
+use App\Filament\AdminAccess;
+use App\Models\Role;
 use App\Models\User;
+use App\Services\Acl\RolePermission;
+use App\Services\Activity\ActivityLogService;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
@@ -14,6 +17,53 @@ use Filament\Schemas\Schema;
 
 class UserForm
 {
+    public const ROLES_FIELD = 'role_ids';
+
+    public static function syncRoles(User $user, ?array $selected): void
+    {
+        $actor = AdminAccess::user();
+        if ($selected === null || $actor === null || $user->is($actor)
+            || ! $actor->hasRolePermission(RolePermission::RESOURCE_ROLES, RolePermission::ASSIGN)) {
+            return;
+        }
+
+        $current = $user->roles()->get();
+        $grantable = Role::query()->get()->filter(fn (Role $role): bool => $actor->canGrantRole($role));
+
+        $kept = $current->reject(fn (Role $role): bool => $grantable->contains($role));
+        $chosen = $grantable->whereIn('id', array_map(intval(...), $selected));
+        $roles = $kept->merge($chosen);
+
+        $user->forceFill(['root_admin' => $roles->contains('root', true)])->saveOrFail();
+
+        $changes = $user->roles()->sync($roles->modelKeys());
+        $user->unsetRelation('roles');
+        if ($changes['attached'] === [] && $changes['detached'] === []) {
+            return;
+        }
+
+        app(ActivityLogService::class)
+            ->subject($user)
+            ->event('user:roles-update')
+            ->property([
+                'old' => $current->pluck('name')->all(),
+                'new' => $roles->pluck('name')->all(),
+            ])
+            ->log();
+    }
+
+    public static function withoutPrivileges(array $data): array
+    {
+        unset($data[self::ROLES_FIELD], $data['root_admin']);
+
+        return $data;
+    }
+
+    private static function editingSelf(?User $record): bool
+    {
+        return (bool) $record?->is(AdminAccess::user());
+    }
+
     public static function configure(Schema $schema): Schema
     {
         return $schema
@@ -78,10 +128,17 @@ class UserForm
                         Section::make(trans('admin/user.details.privileges'))
                             ->icon('heroicon-o-shield-check')
                             ->schema([
-                                Toggle::make('root_admin')
-                                    ->label(trans('admin/user.details.root_admin'))
-                                    ->helperText(trans('admin/user.details.root_admin_desc'))
-                                    ->onColor('success'),
+                                Select::make(self::ROLES_FIELD)
+                                    ->label(trans('admin/roles.user.roles'))
+                                    ->helperText(fn (?User $record): ?string => self::editingSelf($record)
+                                        ? trans('admin/roles.user.roles_self')
+                                        : null)
+                                    ->placeholder(trans('admin/roles.user.none'))
+                                    ->multiple()
+                                    ->options(fn (): array => Role::query()->orderByDesc('root')->orderBy('name')->pluck('name', 'id')->all())
+                                    ->disableOptionWhen(fn (string $value): bool => ! AdminAccess::user()?->canGrantRole(Role::query()->findOrFail($value)))
+                                    ->disabled(fn (?User $record): bool => self::editingSelf($record)
+                                        || ! AdminAccess::allows(RolePermission::RESOURCE_ROLES, RolePermission::ASSIGN)),
                             ]),
                     ])
                     ->columnSpan(6),

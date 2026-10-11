@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Locations;
 
+use App\Filament\Concerns\AuthorizesAdminResource;
 use App\Models\Location;
+use App\Services\Acl\RolePermission;
 use Filament\Actions;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -13,6 +15,10 @@ use Filament\Tables\Table;
 
 class LocationResource extends Resource
 {
+    use AuthorizesAdminResource;
+
+    protected static string $permissionResource = RolePermission::RESOURCE_LOCATIONS;
+
     protected static ?string $model = Location::class;
 
     protected static ?int $navigationSort = 2;
@@ -112,6 +118,7 @@ class LocationResource extends Resource
                 Actions\Action::make('edit')
                     ->label(trans('admin/locations.actions.edit'))
                     ->icon('heroicon-o-pencil')
+                    ->visible(fn (Location $record): bool => static::canEdit($record))
                     ->url(
                         fn (Location $record): string => static::getUrl('edit', ['record' => $record->getKey()])
                     ),
@@ -120,6 +127,7 @@ class LocationResource extends Resource
                     ->label(trans('admin/locations.actions.delete'))
                     ->icon('heroicon-o-trash')
                     ->color('danger')
+                    ->authorize(fn (Location $record): bool => static::canDelete($record))
                     ->requiresConfirmation()
                     ->action(function (Location $record) {
 

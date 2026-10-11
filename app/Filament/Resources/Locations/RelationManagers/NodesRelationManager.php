@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\Locations\RelationManagers;
 
+use App\Filament\Concerns\AuthorizesAdminRelation;
 use App\Filament\Resources\Nodes\NodeResource;
 use App\Models\Node;
+use App\Services\Acl\RolePermission;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -15,6 +17,10 @@ use Filament\Tables\Table;
 
 class NodesRelationManager extends RelationManager
 {
+    use AuthorizesAdminRelation;
+
+    protected static string $permissionResource = RolePermission::RESOURCE_NODES;
+
     protected static string $relationship = 'nodes';
 
     protected static ?string $recordTitleAttribute = 'name';
@@ -89,6 +95,7 @@ class NodesRelationManager extends RelationManager
             ->headerActions([
                 Action::make('create')
                     ->label(trans('admin/node.actions.create'))
+                    ->visible(fn (): bool => NodeResource::canCreate())
                     ->url(fn (): string => NodeResource::getUrl('create'))
                     ->icon('heroicon-o-plus'),
             ])
@@ -96,6 +103,7 @@ class NodesRelationManager extends RelationManager
                 Action::make('view')
                     ->label(trans('admin/node.actions.view'))
                     ->icon('heroicon-o-eye')
+                    ->visible(fn (Node $record): bool => NodeResource::canEdit($record))
                     ->url(fn (Node $record): string => NodeResource::getUrl('edit', ['record' => $record]))
                     ->openUrlInNewTab(false),
 
@@ -104,7 +112,7 @@ class NodesRelationManager extends RelationManager
                     ->icon('heroicon-o-server-stack')
                     ->url(fn (Node $record): string => NodeResource::getUrl('edit', ['record' => $record]).'?activeRelationManager=0')
                     ->color('info')
-                    ->visible(fn (Node $record): bool => $record->allocations_count > 0),
+                    ->visible(fn (Node $record): bool => $record->allocations_count > 0 && NodeResource::canEdit($record)),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

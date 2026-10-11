@@ -11,6 +11,8 @@ interface Window {
         email: string;
         language: string;
         root_admin: boolean;
+        admin?: boolean;
+        permissions?: string[];
         use_totp: boolean;
     };
     SiteConfiguration?: Record<string, any>;

@@ -42,7 +42,9 @@ const TopServerDetails = () => {
     const instance = ServerContext.useStoreState((state) => state.socket.instance);
     const limits = ServerContext.useStoreState((state) => state.server.data!.limits);
     const serverId = ServerContext.useStoreState((state) => state.server.data?.internalId);
-    const accountRootAdmin = useStoreState((state) => state.user.data!.rootAdmin);
+    const accountRootAdmin = useStoreState(
+        (state) => state.user.data!.rootAdmin || state.user.data!.rolePermissions.includes('servers.update'),
+    );
     const { session } = useSubuserPreview();
     const rootAdmin = accountRootAdmin && !session;
 

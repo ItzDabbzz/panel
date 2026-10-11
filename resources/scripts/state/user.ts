@@ -13,6 +13,8 @@ export interface UserData {
     avatarAnimated: boolean;
     archiveFormat: 'tar.gz' | 'zip';
     rootAdmin: boolean;
+    adminAccess: boolean;
+    rolePermissions: string[];
     useTotp: boolean;
     createdAt: Date;
     updatedAt: Date;

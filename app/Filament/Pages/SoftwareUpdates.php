@@ -2,10 +2,12 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\AdminAccess;
 use App\Jobs\Updates\UpdateAgentJob;
 use App\Jobs\Updates\UpdatePanelJob;
 use App\Models\Node;
 use App\Repositories\Agent\DaemonConfigurationRepository;
+use App\Services\Acl\RolePermission;
 use App\Services\Helpers\SoftwareVersionService;
 use App\Services\Updates\InstallationTypeService;
 use App\Services\Updates\SoftwareUpdateStatusService;
@@ -60,7 +62,13 @@ class SoftwareUpdates extends Page
 
     public static function canAccess(): bool
     {
-        return app(InstallationTypeService::class)->panelSupportsSoftwareUpdatesPage();
+        return AdminAccess::allows(RolePermission::RESOURCE_UPDATES)
+            && app(InstallationTypeService::class)->panelSupportsSoftwareUpdatesPage();
+    }
+
+    public static function canUpdate(): bool
+    {
+        return AdminAccess::allows(RolePermission::RESOURCE_UPDATES, RolePermission::UPDATE);
     }
 
     public static function getNavigationGroup(): ?string
@@ -132,6 +140,8 @@ class SoftwareUpdates extends Page
 
     public function updatePanel(): void
     {
+        abort_unless(static::canUpdate(), 403);
+
         $lock = Cache::lock(self::PANEL_UPDATE_ADMISSION_LOCK, 120);
         if (! $lock->get()) {
             Notification::make()->warning()->title(trans('admin/updates.already_running'))->send();
@@ -176,6 +186,8 @@ class SoftwareUpdates extends Page
 
     public function updateAgent(int $nodeId): void
     {
+        abort_unless(static::canUpdate(), 403);
+
         $this->normalizeChannel();
         $node = Node::query()->find($nodeId);
         if (! $node) {
@@ -225,6 +237,8 @@ class SoftwareUpdates extends Page
 
     public function updateAllAgents(): void
     {
+        abort_unless(static::canUpdate(), 403);
+
         $this->refreshUpdates();
         $queued = 0;
         $statuses = app(SoftwareUpdateStatusService::class);

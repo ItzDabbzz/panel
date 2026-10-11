@@ -2,14 +2,21 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\AdminAccess;
 use App\Filament\Resources\ActivityLog\ActivityLogResource;
 use App\Models\ActivityLog;
+use App\Services\Acl\RolePermission;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class ActivityLogWidget extends BaseWidget
 {
+    public static function canView(): bool
+    {
+        return AdminAccess::allows(RolePermission::RESOURCE_ACTIVITY_LOG);
+    }
+
     protected int|string|array $columnSpan = 1;
 
     protected static ?int $sort = 5;

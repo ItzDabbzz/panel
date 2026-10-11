@@ -2,18 +2,24 @@
 
 namespace App\Filament\Resources\Alerts;
 
+use App\Filament\Concerns\AuthorizesAdminResource;
 use App\Filament\Resources\Alerts\Pages\CreateAlert;
 use App\Filament\Resources\Alerts\Pages\EditAlert;
 use App\Filament\Resources\Alerts\Pages\ListAlerts;
 use App\Filament\Resources\Alerts\Schemas\AlertForm;
 use App\Filament\Resources\Alerts\Tables\AlertsTable;
 use App\Models\Alert;
+use App\Services\Acl\RolePermission;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 class AlertResource extends Resource
 {
+    use AuthorizesAdminResource;
+
+    protected static string $permissionResource = RolePermission::RESOURCE_ALERTS;
+
     protected static ?string $model = Alert::class;
 
     protected static ?int $navigationSort = 2;

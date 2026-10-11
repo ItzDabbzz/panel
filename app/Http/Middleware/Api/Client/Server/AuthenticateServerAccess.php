@@ -51,8 +51,8 @@ class AuthenticateServerAccess
         }
 
         if (! ($preview instanceof SubuserPreviewContext) && $user->id !== $server->owner_id && ! $user->root_admin) {
-            // Check for subuser status.
-            if (! $server->subusers->contains('user_id', $user->id)) {
+            // Check for subuser status, or a role that reaches every server.
+            if (! $server->subusers->contains('user_id', $user->id) && $user->roleServerPermissions() === []) {
                 throw new NotFoundHttpException(trans('exceptions.api.resource_not_found'));
             }
         }

@@ -198,7 +198,7 @@
                                         <span>{{ trans('admin/updates.status.queued') }}</span>
                                     </span>
                                 </x-filament::button>
-                            @elseif ($panel['automatic_supported'] && $panel['outdated'])
+                            @elseif ($panel['automatic_supported'] && $panel['outdated'] && $this::canUpdate())
                                 <x-filament::button
                                     size="sm"
                                     x-on:click="updatePanel()"
@@ -225,7 +225,7 @@
 
     <x-filament::section icon="heroicon-o-server-stack">
         <x-slot name="heading">{{ trans('admin/updates.agents') }}</x-slot>
-        @if (collect($agents)->contains(fn ($agent) => $agent['reachable'] && $agent['outdated'] && $agent['installation_type'] === 'native' && ! in_array($agent['status']['state'] ?? null, $busyStates, true)))
+        @if ($this::canUpdate() && collect($agents)->contains(fn ($agent) => $agent['reachable'] && $agent['outdated'] && $agent['installation_type'] === 'native' && ! in_array($agent['status']['state'] ?? null, $busyStates, true)))
             <x-slot name="afterHeader">
                 <x-filament::button color="gray" size="sm" wire:click="updateAllAgents" wire:target="updateAllAgents" wire:loading.attr="disabled" :loading-indicator="false">
                     <span wire:loading.remove wire:target="updateAllAgents" class="software-update-button-content">
@@ -290,7 +290,7 @@
                                                 <span>{{ trans('admin/updates.status.queued') }}</span>
                                             </span>
                                         </x-filament::button>
-                                    @elseif ($agent['reachable'] && $agent['latest_available'] && $agent['outdated'] && $agent['installation_type'] === 'native')
+                                    @elseif ($agent['reachable'] && $agent['latest_available'] && $agent['outdated'] && $agent['installation_type'] === 'native' && $this::canUpdate())
                                         <x-filament::button
                                             size="sm"
                                             wire:click="updateAgent({{ $agent['id'] }})"

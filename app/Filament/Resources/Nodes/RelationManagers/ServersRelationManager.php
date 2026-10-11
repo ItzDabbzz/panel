@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Nodes\RelationManagers;
 
+use App\Filament\Concerns\AuthorizesAdminRelation;
 use App\Models\Server;
+use App\Services\Acl\RolePermission;
 use App\Services\Servers\ServerDeletionService;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -15,6 +17,10 @@ use Throwable;
 
 class ServersRelationManager extends RelationManager
 {
+    use AuthorizesAdminRelation;
+
+    protected static string $permissionResource = RolePermission::RESOURCE_SERVERS;
+
     protected static string $relationship = 'servers';
 
     public function table(Table $table): Table

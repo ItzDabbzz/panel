@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\Nodes\RelationManagers;
 
+use App\Filament\Concerns\AuthorizesAdminRelation;
 use App\Models\Allocation;
 use App\Models\Node;
+use App\Services\Acl\RolePermission;
 use App\Services\Activity\ActivityLogService;
 use App\Services\Allocations\AllocationDeletionService;
 use App\Services\Allocations\AssignmentService;
@@ -18,6 +20,15 @@ use Filament\Tables\Table;
 
 class AllocationRelationManager extends RelationManager
 {
+    use AuthorizesAdminRelation;
+
+    protected static string $permissionResource = RolePermission::RESOURCE_NODES;
+
+    protected static function changesOwner(): bool
+    {
+        return true;
+    }
+
     protected static string $relationship = 'allocations';
 
     public function table(Table $table): Table
@@ -36,6 +47,7 @@ class AllocationRelationManager extends RelationManager
 
                 TextInputColumn::make('ip_alias')
                     ->label(trans('admin/node.allocations.table.alias'))
+                    ->disabled(fn (): bool => ! static::allows(RolePermission::UPDATE))
                     ->toggleable(),
 
                 TextColumn::make('server.name')
@@ -44,6 +56,7 @@ class AllocationRelationManager extends RelationManager
 
                 TextInputColumn::make('notes')
                     ->label(trans('admin/node.allocations.table.notes'))
+                    ->disabled(fn (): bool => ! static::allows(RolePermission::UPDATE))
                     ->toggleable(),
 
                 TextColumn::make('created_at')
@@ -53,6 +66,7 @@ class AllocationRelationManager extends RelationManager
             ])
             ->headerActions([
                 Action::make('addAllocation')
+                    ->authorize(fn (): bool => static::allows(RolePermission::UPDATE))
                     ->label(trans('admin/node.allocations.actions.add'))
                     ->icon('heroicon-o-plus')
                     ->form([
@@ -95,6 +109,7 @@ class AllocationRelationManager extends RelationManager
             ])
             ->actions([
                 Action::make('delete')
+                    ->authorize(fn (): bool => static::allows(RolePermission::UPDATE))
                     ->label(trans('admin/node.allocations.actions.delete'))
                     ->icon('heroicon-o-trash')
                     ->color('danger')

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Nodes;
 
+use App\Filament\Concerns\AuthorizesAdminResource;
 use App\Filament\Resources\Nodes\Pages\CreateNode;
 use App\Filament\Resources\Nodes\Pages\EditNode;
 use App\Filament\Resources\Nodes\Pages\ListNodes;
@@ -10,12 +11,17 @@ use App\Filament\Resources\Nodes\RelationManagers\ServersRelationManager;
 use App\Filament\Resources\Nodes\Schemas\EditNodeForm;
 use App\Filament\Resources\Nodes\Tables\NodesTable;
 use App\Models\Node;
+use App\Services\Acl\RolePermission;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 class NodeResource extends Resource
 {
+    use AuthorizesAdminResource;
+
+    protected static string $permissionResource = RolePermission::RESOURCE_NODES;
+
     protected static ?string $model = Node::class;
 
     protected static ?int $navigationSort = 3;

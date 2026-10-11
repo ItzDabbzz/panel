@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\Nests\RelationManagers;
 
+use App\Filament\Concerns\AuthorizesAdminRelation;
 use App\Filament\Resources\Nests\EggResource;
 use App\Models\Nest;
+use App\Services\Acl\RolePermission;
 use App\Services\Eggs\Sharing\EggExporterService;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -15,6 +17,10 @@ use Filament\Tables\Table;
 
 class EggsRelationManager extends RelationManager
 {
+    use AuthorizesAdminRelation;
+
+    protected static string $permissionResource = RolePermission::RESOURCE_EGGS;
+
     protected static string $relationship = 'eggs';
 
     public function table(Table $table): Table
@@ -41,6 +47,7 @@ class EggsRelationManager extends RelationManager
                 Action::make('create')
                     ->label(trans('admin/eggs.actions.create'))
                     ->icon('heroicon-o-plus')
+                    ->visible(fn (): bool => EggResource::canCreate())
                     ->url(function (): string {
                         /** @var Nest $nest */
                         $nest = $this->getOwnerRecord();
@@ -52,6 +59,7 @@ class EggsRelationManager extends RelationManager
                 Action::make('view')
                     ->label(trans('admin/eggs.actions.edit'))
                     ->icon('heroicon-o-pencil')
+                    ->visible(fn ($record): bool => EggResource::canEdit($record))
                     ->url(fn ($record) => EggResource::getUrl('edit', ['record' => $record])),
                 Action::make('export')
                     ->label(trans('admin/eggs.actions.export'))

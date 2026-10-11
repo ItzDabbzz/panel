@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\ActivityLog;
 
+use App\Filament\Concerns\AuthorizesAdminResource;
 use App\Filament\Resources\ActivityLog\Pages\ListActivityLogs;
 use App\Models\ActivityLog;
 use App\Models\User;
+use App\Services\Acl\RolePermission;
 use Filament\Panel;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
@@ -13,6 +15,10 @@ use Filament\Tables\Table;
 
 class ActivityLogResource extends Resource
 {
+    use AuthorizesAdminResource;
+
+    protected static string $permissionResource = RolePermission::RESOURCE_ACTIVITY_LOG;
+
     protected static ?string $model = ActivityLog::class;
 
     protected static ?int $navigationSort = 3;

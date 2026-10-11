@@ -20,6 +20,7 @@ return [
         'databases' => '数据库',
         'locations' => '区域',
         'nodes' => '节点',
+        'roles' => '角色',
         'servers' => '服务器',
         'users' => '用户',
     ],

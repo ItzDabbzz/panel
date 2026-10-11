@@ -33,6 +33,7 @@ export default () => {
     const nameFirst = useStoreState((state) => state.user.data?.name_first);
     const nameLast = useStoreState((state) => state.user.data?.name_last);
     const rootAdmin = useStoreState((state) => state.user.data!.rootAdmin);
+    const adminAccess = useStoreState((state) => state.user.data!.adminAccess);
     const name = useStoreState((state: ApplicationStore) => state.settings.data!.name);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const { addFlash, clearFlashes } = useFlash();
@@ -91,7 +92,7 @@ export default () => {
                                 <span className='text-sm text-gray-400'>
                                     {rootAdmin ? t('overview.administrator') : name + ' ' + t('overview.user')}
                                 </span>
-                                {rootAdmin && (
+                                {adminAccess && (
                                     // eslint-disable-next-line react/jsx-no-target-blank
                                     <a href={`/admin`} target={'_blank'} className='h-5 w-5'>
                                         <ExternalLinkIcon />

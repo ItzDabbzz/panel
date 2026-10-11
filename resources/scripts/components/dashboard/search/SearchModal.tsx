@@ -43,7 +43,13 @@ export default ({ ...props }: Props) => {
     const { t } = useTranslation('dashboard/index');
     const ref = useRef<HTMLInputElement>(null);
     const searchGeneration = useRef(0);
-    const isAdmin = useStoreState((state) => state.user.data!.rootAdmin);
+    const isAdmin = useStoreState(
+        (state) =>
+            state.user.data!.rootAdmin ||
+            state.user.data!.rolePermissions.some((permission) =>
+                ['servers.read', 'servers.update'].includes(permission),
+            ),
+    );
     const [servers, setServers] = useState<Server[]>([]);
     const { clearAndAddHttpError, clearFlashes } = useStoreActions(
         (actions: Actions<ApplicationStore>) => actions.flashes,

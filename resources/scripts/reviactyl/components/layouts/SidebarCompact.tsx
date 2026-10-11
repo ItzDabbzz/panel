@@ -57,7 +57,7 @@ export const SidebarCompact = React.forwardRef<HTMLDivElement, SidebarProps>(({ 
 export const NavbarCompact = ({ children }: NavbarProps) => {
     const { t } = useTranslation('dashboard/account');
     const [blurred, setBlurred] = useState(false);
-    const rootAdmin = useStoreState((state: ApplicationStore) => state.user.data!.rootAdmin);
+    const adminAccess = useStoreState((state: ApplicationStore) => state.user.data!.adminAccess);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const { session } = useSubuserPreview();
 
@@ -99,7 +99,7 @@ export const NavbarCompact = ({ children }: NavbarProps) => {
                                     <FaUser className='h-4 w-4 inline-flex mr-2' /> {t('overview.profile')}
                                 </DropdownButtonRow>
                             </NavLink>
-                            {rootAdmin && (
+                            {adminAccess && (
                                 <a href='/admin' target='_blank' rel='noreferrer'>
                                     <DropdownButtonRow>
                                         <FaGears className='h-4 w-4 inline-flex mr-2' /> {t('overview.admin')}

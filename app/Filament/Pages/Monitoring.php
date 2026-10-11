@@ -2,12 +2,14 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\AdminAccess;
 use App\Filament\Widgets\MonitoringWidget;
 use App\Filament\Widgets\NodeSelectorWidget;
 use App\Filament\Widgets\ServersWidget;
 use App\Helpers\StorageUnit;
 use App\Models\Node;
 use App\Repositories\Agent\DaemonMonitoringRepository;
+use App\Services\Acl\RolePermission;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Placeholder;
 use Filament\Pages\Page;
@@ -17,6 +19,11 @@ use Livewire\Attributes\On;
 
 class Monitoring extends Page
 {
+    public static function canAccess(): bool
+    {
+        return AdminAccess::allows(RolePermission::RESOURCE_MONITORING);
+    }
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static string|\BackedEnum|null $activeNavigationIcon = 'heroicon-s-chart-bar';

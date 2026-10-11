@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Servers\RelationManagers;
 
+use App\Filament\Concerns\AuthorizesAdminRelation;
 use App\Models\Server;
+use App\Services\Acl\RolePermission;
 use Filament\Actions\AttachAction;
 use Filament\Actions\DetachAction;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -14,6 +16,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class MountsRelationManager extends RelationManager
 {
+    use AuthorizesAdminRelation;
+
+    protected static string $permissionResource = RolePermission::RESOURCE_SERVERS;
+
+    protected static function changesOwner(): bool
+    {
+        return true;
+    }
+
     protected static string $relationship = 'mounts';
 
     public static function getTitle(Model $ownerRecord, string $pageClass): string
@@ -42,6 +53,7 @@ class MountsRelationManager extends RelationManager
             ])
             ->headerActions([
                 AttachAction::make()
+                    ->authorize(fn (): bool => static::allows(RolePermission::UPDATE))
                     ->preloadRecordSelect()
                     ->recordSelectOptionsQuery(function (Builder $query): Builder {
                         /** @var Server $server */
@@ -53,7 +65,8 @@ class MountsRelationManager extends RelationManager
                     }),
             ])
             ->recordActions([
-                DetachAction::make(),
+                DetachAction::make()
+                    ->authorize(fn (): bool => static::allows(RolePermission::UPDATE)),
             ]);
     }
 }

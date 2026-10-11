@@ -2,7 +2,9 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\AdminAccess;
 use App\Models\Node;
+use App\Services\Acl\RolePermission;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Schema;
 use Livewire\Attributes\On;
@@ -10,6 +12,11 @@ use Livewire\Attributes\Url;
 
 class NodeSelectorWidget extends BaseWidget
 {
+    public static function canView(): bool
+    {
+        return AdminAccess::allows(RolePermission::RESOURCE_MONITORING);
+    }
+
     protected static bool $isDiscoverable = false;
 
     protected int|string|array $columnSpan = 'full';

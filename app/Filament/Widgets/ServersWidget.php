@@ -2,10 +2,12 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\AdminAccess;
 use App\Helpers\StorageUnit;
 use App\Models\Node;
 use App\Models\Server;
 use App\Repositories\Agent\DaemonServerStatusRepository;
+use App\Services\Acl\RolePermission;
 use Filament\Forms\Components\Placeholder;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -14,6 +16,11 @@ use Livewire\Attributes\On;
 
 class ServersWidget extends BaseWidget
 {
+    public static function canView(): bool
+    {
+        return AdminAccess::allows(RolePermission::RESOURCE_MONITORING);
+    }
+
     protected static bool $isDiscoverable = false;
 
     public ?int $selectedNodeId = null;

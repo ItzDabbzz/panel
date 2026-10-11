@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\Servers\Tables;
 
+use App\Filament\AdminAccess;
 use App\Helpers\StorageUnit;
 use App\Models\Server;
+use App\Services\Acl\RolePermission;
 use App\Services\Servers\ServerDeletionService;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -162,6 +164,7 @@ class ServersTable
                 // Create an Action to open a new tab to the server's panel page
                 ViewAction::make('view')
                     ->label(trans('admin/server.actions.view'))
+                    ->visible(fn (): bool => AdminAccess::allows(RolePermission::RESOURCE_SERVERS))
                     ->url(fn (Server $record): string => url('/server/'.$record->uuidShort).'/')
                     ->openUrlInNewTab(),
             ])

@@ -20,6 +20,7 @@ return [
         'databases' => 'Database',
         'locations' => 'Lokasi',
         'nodes' => 'Node',
+        'roles' => 'Peran',
         'servers' => 'Server',
         'users' => 'Pengguna',
     ],

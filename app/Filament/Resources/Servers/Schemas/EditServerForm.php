@@ -326,17 +326,20 @@ class EditServerForm
                                             ]),
                                         Section::make(trans('admin/server.edit.sections.delete_server'))
                                             ->description(trans('admin/server.edit.section_descriptions.delete_server'))
+                                            ->visible(fn (?Server $record): bool => $record !== null && ServerResource::canDelete($record))
                                             ->schema([
                                                 Actions::make([
                                                     Action::make('delete_server')
                                                         ->label(trans('admin/server.edit.actions.delete_server'))
                                                         ->color('danger')
+                                                        ->authorize(fn (Server $record): bool => ServerResource::canDelete($record))
                                                         ->requiresConfirmation()
                                                         ->action(fn (Server $record) => self::delete($record, false)),
 
                                                     Action::make('force_delete_server')
                                                         ->label(trans('admin/server.edit.actions.forcibly_delete_server'))
                                                         ->color('danger')
+                                                        ->authorize(fn (Server $record): bool => ServerResource::canDelete($record))
                                                         ->requiresConfirmation()
                                                         ->action(fn (Server $record) => self::delete($record, true)),
                                                 ]),

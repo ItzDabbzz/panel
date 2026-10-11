@@ -20,6 +20,7 @@ return [
         'databases' => 'Databaser',
         'locations' => 'Platser',
         'nodes' => 'Noder',
+        'roles' => 'Roller',
         'servers' => 'Servrar',
         'users' => 'Användare',
     ],

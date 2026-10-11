@@ -2,9 +2,11 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\AdminAccess;
 use App\Helpers\StorageUnit;
 use App\Models\Node;
 use App\Repositories\Agent\DaemonMonitoringRepository;
+use App\Services\Acl\RolePermission;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -13,6 +15,11 @@ use Livewire\Attributes\On;
 
 class MonitoringWidget extends BaseWidget
 {
+    public static function canView(): bool
+    {
+        return AdminAccess::allows(RolePermission::RESOURCE_MONITORING);
+    }
+
     protected static bool $isDiscoverable = false;
 
     public ?int $selectedNodeId = null;

@@ -2,7 +2,9 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\AdminAccess;
 use App\Filament\Pages\SoftwareUpdates;
+use App\Services\Acl\RolePermission;
 use App\Services\Helpers\SoftwareVersionService;
 use App\Services\Updates\InstallationTypeService;
 use Filament\Actions\Action;
@@ -12,6 +14,11 @@ use Filament\Schemas\Schema;
 
 class UpdateWidget extends BaseWidget
 {
+    public static function canView(): bool
+    {
+        return AdminAccess::allows(RolePermission::RESOURCE_UPDATES);
+    }
+
     protected int|string|array $columnSpan = 2;
 
     protected static ?int $sort = 1;

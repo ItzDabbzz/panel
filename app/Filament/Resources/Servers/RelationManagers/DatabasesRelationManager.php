@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Servers\RelationManagers;
 
+use App\Filament\Concerns\AuthorizesAdminRelation;
 use App\Models\Database;
 use App\Models\DatabaseHost;
 use App\Models\Server;
+use App\Services\Acl\RolePermission;
 use App\Services\Databases\DatabaseManagementService;
 use App\Services\Databases\DatabasePasswordService;
 use Filament\Actions\Action;
@@ -18,6 +20,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class DatabasesRelationManager extends RelationManager
 {
+    use AuthorizesAdminRelation;
+
+    protected static string $permissionResource = RolePermission::RESOURCE_SERVERS;
+
+    protected static function changesOwner(): bool
+    {
+        return true;
+    }
+
     protected static string $relationship = 'databases';
 
     public function table(Table $table): Table
@@ -57,6 +68,7 @@ class DatabasesRelationManager extends RelationManager
             ])
             ->headerActions([
                 Action::make('create_database')
+                    ->authorize(fn (): bool => static::allows(RolePermission::UPDATE))
                     ->label(trans('admin/server.databases.actions.create_database'))
                     ->icon('heroicon-o-plus')
                     ->form([
@@ -111,6 +123,7 @@ class DatabasesRelationManager extends RelationManager
             ])
             ->recordActions([
                 Action::make('reset_password')
+                    ->authorize(fn (): bool => static::allows(RolePermission::UPDATE))
                     ->label(trans('admin/server.databases.actions.reset_password'))
                     ->icon('heroicon-o-key')
                     ->color('warning')
@@ -134,6 +147,7 @@ class DatabasesRelationManager extends RelationManager
                     }),
 
                 Action::make('delete')
+                    ->authorize(fn (): bool => static::allows(RolePermission::UPDATE))
                     ->label(trans('admin/server.databases.actions.delete'))
                     ->icon('heroicon-o-trash')
                     ->color('danger')

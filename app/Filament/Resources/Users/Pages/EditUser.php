@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users\Pages;
 
+use App\Filament\Resources\Users\Schemas\UserForm;
 use App\Filament\Resources\Users\UserResource;
 use App\Models\User;
 use App\Services\Users\UserUpdateService;
@@ -20,12 +21,29 @@ class EditUser extends EditRecord
         ];
     }
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        /** @var User $user */
+        $user = $this->record;
+        if ($user->root_admin) {
+            $user->syncRootRole();
+        }
+
+        $data[UserForm::ROLES_FIELD] = $user->roles()->pluck('roles.id')->all();
+
+        return $data;
+    }
+
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         if (! $record instanceof User) {
             throw new \RuntimeException('Invalid user record provided for update.');
         }
 
-        return app(UserUpdateService::class)->handle($record, $data);
+        $user = app(UserUpdateService::class)->handle($record, UserForm::withoutPrivileges($data));
+
+        UserForm::syncRoles($user, $data[UserForm::ROLES_FIELD] ?? null);
+
+        return $user;
     }
 }

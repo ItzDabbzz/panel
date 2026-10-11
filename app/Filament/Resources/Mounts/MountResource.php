@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\Mounts;
 
+use App\Filament\Concerns\AuthorizesAdminResource;
 use App\Models\Mount;
+use App\Services\Acl\RolePermission;
 use App\Services\Activity\ActivityLogService;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -20,6 +22,10 @@ use Filament\Tables\Table;
 
 class MountResource extends Resource
 {
+    use AuthorizesAdminResource;
+
+    protected static string $permissionResource = RolePermission::RESOURCE_MOUNTS;
+
     protected static ?string $model = Mount::class;
 
     protected static ?int $navigationSort = 2;

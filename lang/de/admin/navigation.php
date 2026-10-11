@@ -20,6 +20,7 @@ return [
         'databases' => 'Datenbanken',
         'locations' => 'Standorte',
         'nodes' => 'Knoten',
+        'roles' => 'Rollen',
         'servers' => 'Server',
         'users' => 'Benutzer',
     ],

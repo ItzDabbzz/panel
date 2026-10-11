@@ -2,8 +2,10 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\AdminAccess;
 use App\Models\Server;
 use App\Models\User;
+use App\Services\Acl\RolePermission;
 use App\Services\Helpers\SoftwareVersionService;
 use Carbon\CarbonInterface;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -17,21 +19,41 @@ class DashboardStatsOverview extends BaseWidget
         $start = now()->subDays(6)->startOfDay();
 
         return [
+            ...$this->userStats($start),
+            ...$this->serverStats($start),
+            ...$this->softwareVersionWidget(),
+        ];
+    }
+
+    private function userStats(CarbonInterface $start): array
+    {
+        if (! AdminAccess::allows(RolePermission::RESOURCE_USERS)) {
+            return [];
+        }
+
+        return [
             Stat::make(trans('admin/index.dashboard.total_users'), User::query()->count())
                 ->description(trans('admin/index.dashboard.new_users', ['count' => User::query()->whereDate('created_at', today())->count()]))
                 ->descriptionIcon('heroicon-o-users')
                 ->chart($this->getDailyCreatedCounts(User::class, $start))
                 ->color('success')
                 ->icon('heroicon-o-users'),
+        ];
+    }
 
+    private function serverStats(CarbonInterface $start): array
+    {
+        if (! AdminAccess::allows(RolePermission::RESOURCE_SERVERS)) {
+            return [];
+        }
+
+        return [
             Stat::make(trans('admin/index.dashboard.total_servers'), Server::query()->count())
                 ->description(trans('admin/index.dashboard.new_servers', ['count' => Server::query()->whereDate('created_at', today())->count()]))
                 ->descriptionIcon('heroicon-o-server-stack')
                 ->chart($this->getDailyCreatedCounts(Server::class, $start))
                 ->color('info')
                 ->icon('heroicon-o-server-stack'),
-
-            ...$this->softwareVersionWidget(),
         ];
     }
 

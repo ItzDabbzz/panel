@@ -41,7 +41,8 @@ class ServerPolicy
             return true;
         }
 
-        return $this->checkPermission($user, $server, $ability);
+        return $this->checkPermission($user, $server, $ability)
+            || in_array($ability, $user->roleServerPermissions(), true);
     }
 
     /**
