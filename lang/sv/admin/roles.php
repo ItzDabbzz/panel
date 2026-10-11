@@ -45,6 +45,7 @@ return [
         'eggs' => 'Eggs',
         'mounts' => 'Monteringar',
         'alerts' => 'Aviseringar',
+        'webhooks' => 'Webhooks',
         'extensions' => 'Tillägg',
         'activity_log' => 'Aktivitetslogg',
         'monitoring' => 'Övervakning',

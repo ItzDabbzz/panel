@@ -8,6 +8,7 @@ return [
         'settings' => 'ಸೆಟ್ಟಿಂಗ್‌ಗಳು',
         'api' => 'ಅಪ್ಲಿಕೇಶನ್ API',
         'activity_log' => 'ಚಟುವಟಿಕೆ ಲಾಗ್',
+        'webhooks' => 'ವೆಬ್‌ಹುಕ್‌ಗಳು',
         'user_activity_metrics' => 'ಸಕ್ರಿಯ ಬಳಕೆದಾರರ ಸ್ಥಳಗಳು',
         'user_activity_description' => 'ಕಳೆದ 30 ದಿನಗಳಲ್ಲಿ ಸಕ್ರಿಯವಾಗಿದ್ದ ಬಳಕೆದಾರರ ಸ್ಥಳ.',
         'active_users' => 'ಸಕ್ರಿಯ ಬಳಕೆದಾರರು',

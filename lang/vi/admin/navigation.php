@@ -8,6 +8,7 @@ return [
         'settings' => 'Cài đặt',
         'api' => 'API ứng dụng',
         'activity_log' => 'Nhật ký hoạt động',
+        'webhooks' => 'Webhook',
         'user_activity_metrics' => 'Vị trí người dùng đang hoạt động',
         'user_activity_description' => 'Vị trí của người dùng hoạt động trong 30 ngày qua.',
         'active_users' => 'Người dùng đang hoạt động',

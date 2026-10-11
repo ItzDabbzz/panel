@@ -8,6 +8,7 @@ return [
         'settings' => 'Pengaturan',
         'api' => 'API Aplikasi',
         'activity_log' => 'Catatan Aktivitas',
+        'webhooks' => 'Webhook',
         'user_activity_metrics' => 'Lokasi Pengguna Aktif',
         'user_activity_description' => 'Lokasi pengguna aktif dalam 30 hari terakhir.',
         'active_users' => 'Pengguna aktif',

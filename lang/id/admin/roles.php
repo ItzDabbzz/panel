@@ -45,6 +45,7 @@ return [
         'eggs' => 'Egg',
         'mounts' => 'Mount',
         'alerts' => 'Peringatan',
+        'webhooks' => 'Webhook',
         'extensions' => 'Ekstensi',
         'activity_log' => 'Catatan Aktivitas',
         'monitoring' => 'Pemantauan',

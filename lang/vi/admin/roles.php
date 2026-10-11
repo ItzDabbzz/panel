@@ -45,6 +45,7 @@ return [
         'eggs' => 'Egg',
         'mounts' => 'Gắn kết',
         'alerts' => 'Cảnh báo',
+        'webhooks' => 'Webhook',
         'extensions' => 'Tiện ích mở rộng',
         'activity_log' => 'Nhật ký hoạt động',
         'monitoring' => 'Giám sát',

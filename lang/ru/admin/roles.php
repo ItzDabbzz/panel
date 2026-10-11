@@ -45,6 +45,7 @@ return [
         'eggs' => 'Eggs',
         'mounts' => 'Точки монтирования',
         'alerts' => 'Оповещения',
+        'webhooks' => 'Вебхуки',
         'extensions' => 'Расширения',
         'activity_log' => 'Журнал активности',
         'monitoring' => 'Мониторинг',

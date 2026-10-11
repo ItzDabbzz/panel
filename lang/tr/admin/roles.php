@@ -45,6 +45,7 @@ return [
         'eggs' => 'Egg\'ler',
         'mounts' => 'Bağlama Noktaları',
         'alerts' => 'Uyarılar',
+        'webhooks' => 'Webhook\'lar',
         'extensions' => 'Uzantılar',
         'activity_log' => 'Etkinlik Günlüğü',
         'monitoring' => 'İzleme',

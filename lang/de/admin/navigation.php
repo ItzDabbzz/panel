@@ -8,6 +8,7 @@ return [
         'settings' => 'Einstellungen',
         'api' => 'Anwendungs-API',
         'activity_log' => 'Aktivitäts-Log',
+        'webhooks' => 'Webhooks',
         'user_activity_metrics' => 'Standorte aktiver Nutzer',
         'user_activity_description' => 'Standort der in den letzten 30 Tagen aktiven Nutzer.',
         'active_users' => 'Aktive Nutzer',

@@ -45,6 +45,7 @@ return [
         'eggs' => 'ಎಗ್‌ಗಳು',
         'mounts' => 'ಮೌಂಟ್‌ಗಳು',
         'alerts' => 'ಎಚ್ಚರಿಕೆಗಳು',
+        'webhooks' => 'ವೆಬ್‌ಹುಕ್‌ಗಳು',
         'extensions' => 'ವಿಸ್ತರಣೆಗಳು',
         'activity_log' => 'ಚಟುವಟಿಕೆ ಲಾಗ್',
         'monitoring' => 'ಮಾನಿಟರಿಂಗ್',

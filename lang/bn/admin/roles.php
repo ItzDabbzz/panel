@@ -45,6 +45,7 @@ return [
         'eggs' => 'এগসমূহ',
         'mounts' => 'মাউন্টসমূহ',
         'alerts' => 'সতর্কবার্তাসমূহ',
+        'webhooks' => 'ওয়েবহুকসমূহ',
         'extensions' => 'এক্সটেনশনসমূহ',
         'activity_log' => 'কার্যকলাপ লগ',
         'monitoring' => 'মনিটরিং',
