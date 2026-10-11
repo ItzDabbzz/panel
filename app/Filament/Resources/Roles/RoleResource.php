@@ -60,6 +60,7 @@ class RoleResource extends Resource
         ],
         'administration' => [
             RolePermission::RESOURCE_ALERTS,
+            RolePermission::RESOURCE_WEBHOOKS,
             RolePermission::RESOURCE_ACTIVITY_LOG,
             RolePermission::RESOURCE_MONITORING,
             RolePermission::RESOURCE_SETTINGS,

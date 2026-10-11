@@ -76,6 +76,7 @@ class AppServiceProvider extends ServiceProvider
             'ssh_key' => Models\UserSSHKey::class,
             'task' => Models\Task::class,
             'user' => Models\User::class,
+            'webhook' => Models\Webhook::class,
         ]);
     }
 

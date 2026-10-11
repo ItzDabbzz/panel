@@ -8,6 +8,7 @@ return [
         'settings' => 'सेटिंग्स',
         'api' => 'एप्लिकेशन API',
         'activity_log' => 'गतिविधि लॉग',
+        'webhooks' => 'वेबहुक',
         'user_activity_metrics' => 'सक्रिय उपयोगकर्ताओं के स्थान',
         'user_activity_description' => 'पिछले 30 दिनों में सक्रिय उपयोगकर्ताओं का स्थान।',
         'active_users' => 'सक्रिय उपयोगकर्ता',

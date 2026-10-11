@@ -8,6 +8,7 @@ return [
         'settings' => 'الإعدادات',
         'api' => 'مفتاح واجهة البرمجة',
         'activity_log' => 'سجل النشاطات',
+        'webhooks' => 'ويب هوك',
         'user_activity_metrics' => 'مواقع المستخدمين النشطين',
         'user_activity_description' => 'موقع المستخدمين النشطين خلال آخر 30 يومًا.',
         'active_users' => 'المستخدمون النشطون',

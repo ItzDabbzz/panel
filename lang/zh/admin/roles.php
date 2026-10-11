@@ -45,6 +45,7 @@ return [
         'eggs' => 'Egg',
         'mounts' => '挂载',
         'alerts' => '公告',
+        'webhooks' => 'Webhook',
         'extensions' => '扩展',
         'activity_log' => '活动日志',
         'monitoring' => '监控',

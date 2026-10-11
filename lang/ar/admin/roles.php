@@ -45,6 +45,7 @@ return [
         'eggs' => 'البيوض',
         'mounts' => 'التوصيلات',
         'alerts' => 'التنبيهات',
+        'webhooks' => 'ويب هوك',
         'extensions' => 'ملحقات',
         'activity_log' => 'سجل النشاطات',
         'monitoring' => 'المراقبة',

@@ -8,6 +8,7 @@ return [
         'settings' => '设置',
         'api' => '应用 API',
         'activity_log' => '活动日志',
+        'webhooks' => 'Webhook',
         'user_activity_metrics' => '活跃用户位置',
         'user_activity_description' => '过去 30 天内活跃用户的位置。',
         'active_users' => '活跃用户',

@@ -45,6 +45,7 @@ return [
         'eggs' => 'Eggs',
         'mounts' => 'Supports',
         'alerts' => 'Alertes',
+        'webhooks' => 'Webhooks',
         'extensions' => 'Rallonges',
         'activity_log' => 'Journal d’activité',
         'monitoring' => 'Surveillance',

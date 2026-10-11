@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Events\Server\Installed as ServerInstalledEvent;
 use App\Listeners\Auth\AuthenticationListener;
+use App\Listeners\Webhooks\DispatchWebhooks;
 use App\Models\EggVariable;
 use App\Models\Server;
 use App\Models\Subuser;
@@ -26,6 +27,7 @@ class EventServiceProvider extends ServiceProvider
 
     protected $subscribe = [
         AuthenticationListener::class,
+        DispatchWebhooks::class,
     ];
 
     /**

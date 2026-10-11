@@ -8,6 +8,7 @@ return [
         'settings' => 'Inställningar',
         'api' => 'Applikations-API',
         'activity_log' => 'Aktivitetslogg',
+        'webhooks' => 'Webhooks',
         'user_activity_metrics' => 'Platser för aktiva användare',
         'user_activity_description' => 'Platser för användare som har varit aktiva under de senaste 30 dagarna.',
         'active_users' => 'Aktiva användare',
