@@ -135,7 +135,7 @@ class AppSettingsCommand extends Command
             $this->variables['APP_ENVIRONMENT_ONLY'] = $this->confirm('Enable UI based settings editor?', true) ? 'false' : 'true';
         }
 
-        $this->output->comment('Please reference https://www.reviactyl.app/docs/panel/additional-configuration#telemetry for more detailed information regarding telemetry data and collection.');
+        $this->output->comment('Please reference https://docs.reviactyl.app/project/panel/additional-configuration#telemetry for more detailed information regarding telemetry data and collection.');
         $this->variables['PANEL_TELEMETRY_ENABLED'] = $this->option('telemetry') ?? $this->confirm(
             'Enable sending anonymous telemetry data?',
             config('panel.telemetry.enabled', true)

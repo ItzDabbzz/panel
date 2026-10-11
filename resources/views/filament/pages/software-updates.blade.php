@@ -214,7 +214,7 @@
                             @elseif ($panel['automatic_supported'] && $panel['latest_available'])
                                 <x-filament::button size="sm" color="gray" icon="heroicon-o-check" disabled>{{ trans('admin/updates.up_to_date') }}</x-filament::button>
                             @else
-                                <x-filament::button size="sm" color="gray" icon="heroicon-o-book-open" tag="a" href="https://reviactyl.app/docs/panel/updating-the-panel" target="_blank">{{ trans('admin/updates.documentation') }}</x-filament::button>
+                                <x-filament::button size="sm" color="gray" icon="heroicon-o-book-open" tag="a" href="https://docs.reviactyl.app/project/panel/updating-the-panel" target="_blank">{{ trans('admin/updates.documentation') }}</x-filament::button>
                             @endif
                         </td>
                     </tr>
@@ -311,7 +311,7 @@
                                     @elseif ($agent['reachable'] && $agent['latest_available'] && ! $agent['outdated'])
                                         <x-filament::button size="sm" color="gray" icon="heroicon-o-check" disabled>{{ trans('admin/updates.up_to_date') }}</x-filament::button>
                                     @else
-                                        <x-filament::button size="sm" color="gray" icon="heroicon-o-book-open" tag="a" href="https://reviactyl.app/docs/agent/updating-agent" target="_blank">{{ trans('admin/updates.documentation') }}</x-filament::button>
+                                        <x-filament::button size="sm" color="gray" icon="heroicon-o-book-open" tag="a" href="https://docs.reviactyl.app/project/agent/updating-agent" target="_blank">{{ trans('admin/updates.documentation') }}</x-filament::button>
                                     @endif
                                 </td>
                             </tr>

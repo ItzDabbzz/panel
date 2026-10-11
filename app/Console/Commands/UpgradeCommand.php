@@ -21,7 +21,7 @@ class UpgradeCommand extends Command
     ): int {
         if (! $installationTypes->panelSupportsAutomaticUpdates()) {
             $this->error('Automatic Panel updates require a released native installation using MySQL, MariaDB, PostgreSQL, or SQLite.');
-            $this->line('See https://reviactyl.app/docs/panel/updating-the-panel for the Docker update process.');
+            $this->line('See https://docs.reviactyl.app/project/panel/updating-the-panel for the Docker update process.');
 
             return self::FAILURE;
         }

@@ -80,7 +80,7 @@
 
                         updateUrl = updateInPanel
                             ? $el.dataset.updatesUrl
-                            : 'https://reviactyl.app/docs/agent/updating-agent';
+                            : 'https://docs.reviactyl.app/project/agent/updating-agent';
 
                         status = 'outdated';
                     } else {
@@ -153,8 +153,8 @@
         x-cloak
         role="link"
         tabindex="0"
-        @click="window.open('https://reviactyl.app/docs/agent/migrating-from-wings', '_blank')"
-        @keydown.enter="window.open('https://reviactyl.app/docs/agent/migrating-from-wings', '_blank')"
+        @click="window.open('https://docs.reviactyl.app/project/agent/migrating-from-wings', '_blank')"
+        @keydown.enter="window.open('https://docs.reviactyl.app/project/agent/migrating-from-wings', '_blank')"
         class="cursor-pointer"
     >
         <x-tabler-alert-triangle class="size-5 text-orange-500" />

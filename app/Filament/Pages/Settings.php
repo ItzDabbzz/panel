@@ -429,7 +429,7 @@ class Settings extends Page implements HasSchemas
                             Action::make('google_oauth_docs')
                                 ->label('')
                                 ->icon('tabler-info-circle')
-                                ->url('https://reviactyl.app/docs/panel/additional-configuration#google')
+                                ->url('https://docs.reviactyl.app/project/panel/additional-configuration#google')
                                 ->openUrlInNewTab()
                                 ->color('primary'),
                         )
@@ -476,7 +476,7 @@ class Settings extends Page implements HasSchemas
                             Action::make('discord_oauth_docs')
                                 ->label('')
                                 ->icon('tabler-info-circle')
-                                ->url('https://reviactyl.app/docs/panel/additional-configuration#discord')
+                                ->url('https://docs.reviactyl.app/project/panel/additional-configuration#discord')
                                 ->openUrlInNewTab()
                                 ->color('primary'),
                         )
@@ -523,7 +523,7 @@ class Settings extends Page implements HasSchemas
                             Action::make('github_oauth_docs')
                                 ->label('')
                                 ->icon('tabler-info-circle')
-                                ->url('https://reviactyl.app/docs/panel/additional-configuration#github')
+                                ->url('https://docs.reviactyl.app/project/panel/additional-configuration#github')
                                 ->color('primary')
                                 ->openUrlInNewTab(),
                         )

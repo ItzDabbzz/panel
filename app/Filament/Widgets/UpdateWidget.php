@@ -39,7 +39,7 @@ class UpdateWidget extends BaseWidget
                         ->url(
                             fn (): string => app(InstallationTypeService::class)->panelSupportsAutomaticUpdates()
                                 ? SoftwareUpdates::getUrl()
-                                : 'https://reviactyl.app/docs/panel/updating-the-panel',
+                                : 'https://docs.reviactyl.app/project/panel/updating-the-panel',
                             fn (): bool => ! app(InstallationTypeService::class)->panelSupportsAutomaticUpdates(),
                         )
                         ->color('warning'),

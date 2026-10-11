@@ -123,7 +123,7 @@
             Please update to the latest version to ensure continued support and access to new features. An outdated agent may have connectivity issues or lack important security updates.
 
             <x-slot:actions>
-                <a href="https://reviactyl.app/docs/agent/updating-agent" target="_blank" rel="noopener noreferrer">
+                <a href="https://docs.reviactyl.app/project/agent/updating-agent" target="_blank" rel="noopener noreferrer">
                     View Update Guide &rarr;
                 </a>
             </x-slot:actions>
@@ -135,7 +135,7 @@
             Most of the features are not compatible with wings. Please upgrade to the latest Reviactyl Agent to ensure continued support and access to new features.
 
             <x-slot:actions>
-                <a href="https://reviactyl.app/docs/agent/migrating-from-wings" target="_blank" rel="noopener noreferrer">
+                <a href="https://docs.reviactyl.app/project/agent/migrating-from-wings" target="_blank" rel="noopener noreferrer">
                     View Migration Guide &rarr;
                 </a>
             </x-slot:actions>
