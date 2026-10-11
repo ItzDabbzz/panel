@@ -4,6 +4,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { EditorView } from '@codemirror/view';
 import { undo, undoDepth } from '@codemirror/commands';
 import { language } from '@codemirror/language';
+import modes from '@/modes';
 import CodemirrorEditor from './CodemirrorEditor';
 
 let container: HTMLDivElement;
@@ -72,4 +73,9 @@ it('loads syntax support and removes it when the mode switches to plain text', a
     await vi.waitFor(() => expect(view.state.facet(language)).not.toBeNull());
     await render('const x = 1;');
     expect(view.state.facet(language)).toBeNull();
+});
+
+it.each(modes.filter((mode) => mode.mime !== 'text/plain'))('loads language support for $name', async ({ mime }) => {
+    const view = await render('example content', vi.fn(), mime);
+    await vi.waitFor(() => expect(view.state.facet(language)).not.toBeNull());
 });
