@@ -29,6 +29,12 @@ class ListNests extends ListRecords
                 ->color('gray')
                 ->form([
                     FileUpload::make('file')
+                        ->extraAttributes([
+                            'data-compatible-file-picker' => 'json',
+                            'data-file-picker-select-error' => trans('generic.file-picker-select-error'),
+                            'data-file-picker-read-error' => trans('generic.file-picker-read-error'),
+                            'data-file-picker-fallback' => trans('generic.file-picker-fallback'),
+                        ])
                         ->label(trans('admin/nests.import.file_label'))
                         ->acceptedFileTypes(['application/json'])
                         ->required()

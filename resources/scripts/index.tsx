@@ -23,7 +23,9 @@ if (import.meta.env.PROD && typeof window !== 'undefined') {
 if (typeof window !== 'undefined') {
     (window as any).React = React;
 
-    const reviactylModules = import.meta.glob('./reviactyl/**/*.{ts,tsx}', { eager: true });
+    const reviactylModules = import.meta.glob(['./reviactyl/**/*.{ts,tsx}', '!./reviactyl/**/*.{test,spec}.{ts,tsx}'], {
+        eager: true,
+    });
     const moduleRegistry = Object.fromEntries(
         Object.entries(reviactylModules).map(([key, mod]) => {
             const normalized = key.replace(/^\.\/reviactyl\//, 'reviactyl/').replace(/\.(ts|tsx)$/, '');

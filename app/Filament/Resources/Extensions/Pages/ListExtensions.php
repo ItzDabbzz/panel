@@ -28,6 +28,12 @@ class ListExtensions extends ListRecords
                 ->authorize(fn (): bool => AdminAccess::allows(RolePermission::RESOURCE_EXTENSIONS, RolePermission::UPDATE))
                 ->form([
                     FileUpload::make('file')
+                        ->extraAttributes([
+                            'data-compatible-file-picker' => 'any',
+                            'data-file-picker-select-error' => trans('generic.file-picker-select-error'),
+                            'data-file-picker-read-error' => trans('generic.file-picker-read-error'),
+                            'data-file-picker-fallback' => trans('generic.file-picker-fallback'),
+                        ])
                         ->label(trans('admin/extensions.columns.file'))
                         ->helperText(trans('admin/extensions.alerts.upload_hint'))
                         ->required()

@@ -44,6 +44,10 @@ class AdminPanelProvider extends PanelProvider
                 Js::make('admin-session-expired', resource_path('js/filament/admin-session-expired.js')),
             ])
             ->breadcrumbs(false)
+            ->renderHook(
+                PanelsRenderHook::BODY_END,
+                fn () => Blade::render('@vite("resources/scripts/admin/filePicker.ts")'),
+            )
             ->navigationGroups([
                 NavigationGroup::make(fn () => trans('admin/navigation.administration.title'))
                     ->collapsible(false),
