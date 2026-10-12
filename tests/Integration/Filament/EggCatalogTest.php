@@ -240,7 +240,13 @@ class EggCatalogTest extends IntegrationTestCase
     {
         $service = app(CatalogImportService::class);
         $token = $service->stage('Pterodactyl', 'paper');
-        DB::unprepared("CREATE TRIGGER catalog_failure BEFORE UPDATE OF catalog_origin ON eggs BEGIN SELECT RAISE(ABORT, 'Fixture provenance failure'); END");
+        $dispatcher = Egg::getEventDispatcher();
+        Egg::setEventDispatcher(clone $dispatcher);
+        Egg::updating(function (Egg $egg): void {
+            if ($egg->isDirty('catalog_origin')) {
+                throw new QueryException(DB::connection()->getName(), 'UPDATE eggs SET catalog_origin = ?', [], new \RuntimeException('Fixture provenance failure'));
+            }
+        });
         try {
             $service->import($token, Nest::factory()->create()->id);
             $this->fail('Failure ignored');
@@ -248,7 +254,7 @@ class EggCatalogTest extends IntegrationTestCase
             $this->assertSame(0, Egg::query()->count());
             $this->assertDatabaseCount('egg_variables', 0);
         } finally {
-            DB::unprepared('DROP TRIGGER catalog_failure');
+            Egg::setEventDispatcher($dispatcher);
         }
     }
 

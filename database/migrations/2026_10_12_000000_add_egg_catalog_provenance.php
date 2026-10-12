@@ -17,6 +17,13 @@ return new class extends Migration
 
     public function down(): void
     {
+        // MySQL may discard the original index when the catalog index supports the foreign key.
+        if (! Schema::hasIndex('eggs', ['nest_id'])) {
+            Schema::table('eggs', function (Blueprint $table): void {
+                $table->index('nest_id');
+            });
+        }
+
         Schema::table('eggs', function (Blueprint $table): void {
             $table->dropUnique('eggs_nest_catalog_unique');
             $table->dropColumn(['catalog_key', 'catalog_origin']);
