@@ -101,7 +101,42 @@ class DatabaseImportService
             $remote['password'] ?? '',
         );
 
-        return $this->import($database, $this->remoteStatements($source), $wipe, $progress);
+        $stream = tmpfile();
+        if ($stream === false) {
+            throw new DatabaseImportException(DatabaseImportException::UNKNOWN, 'Could not create a temporary remote dump.');
+        }
+
+        try {
+            foreach ($this->remoteStatements($source) as $statement) {
+                $line = base64_encode($statement)."\n";
+                if (fwrite($stream, $line) !== strlen($line)) {
+                    throw new DatabaseImportException(DatabaseImportException::UNKNOWN, 'Could not write the temporary remote dump.');
+                }
+            }
+
+            if (! rewind($stream)) {
+                throw new DatabaseImportException(DatabaseImportException::UNKNOWN, 'Could not rewind the temporary remote dump.');
+            }
+
+            return $this->import($database, $this->bufferedStatements($stream), $wipe, $progress);
+        } finally {
+            fclose($stream);
+        }
+    }
+
+    /**
+     * @param  resource  $stream
+     * @return \Generator<int, string>
+     */
+    private function bufferedStatements($stream): \Generator
+    {
+        while (($line = fgets($stream)) !== false) {
+            yield base64_decode(rtrim($line, "\n"));
+        }
+
+        if (! feof($stream)) {
+            throw new DatabaseImportException(DatabaseImportException::UNKNOWN, 'Could not read the temporary remote dump.');
+        }
     }
 
     /**
