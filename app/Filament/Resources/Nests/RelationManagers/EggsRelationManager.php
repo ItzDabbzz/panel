@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Nests\RelationManagers;
 
 use App\Filament\Concerns\AuthorizesAdminRelation;
 use App\Filament\Resources\Nests\EggResource;
+use App\Models\Egg;
 use App\Models\Nest;
 use App\Services\Acl\RolePermission;
 use App\Services\Eggs\Sharing\EggExporterService;
@@ -89,6 +90,16 @@ class EggsRelationManager extends RelationManager
 
                             $action->cancel();
                         }
+
+                        if (Egg::query()->where('config_from', $record->id)->exists()) {
+                            Notification::make()
+                                ->title(trans('admin/eggs.notices.cannot_delete'))
+                                ->body(trans('exceptions.nest.egg.has_children'))
+                                ->danger()
+                                ->send();
+
+                            $action->cancel();
+                        }
                     }),
             ])
             ->bulkActions([
@@ -102,9 +113,20 @@ class EggsRelationManager extends RelationManager
                                 ->warning()
                                 ->send();
                         }
+
+                        if (Egg::query()->whereIn('config_from', $records->modelKeys())->exists()) {
+                            Notification::make()
+                                ->title(trans('admin/eggs.notices.cannot_delete'))
+                                ->body(trans('exceptions.nest.egg.has_children'))
+                                ->warning()
+                                ->send();
+                        }
                     })
                     ->action(function ($records) {
-                        $deletable = $records->filter(fn ($record) => $record->servers()->count() === 0);
+                        $parentIds = Egg::query()->whereIn('config_from', $records->modelKeys())
+                            ->distinct()->pluck('config_from')->flip();
+                        $deletable = $records->filter(fn ($record) => $record->servers()->count() === 0
+                            && ! $parentIds->has($record->id));
                         $deletable->each->delete();
                     }),
             ]);
