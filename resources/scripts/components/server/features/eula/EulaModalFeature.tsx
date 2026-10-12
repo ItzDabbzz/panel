@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { ServerContext } from '@/state/server';
 import Modal from '@/reviactyl/elements/Modal';
 import Button from '@/reviactyl/elements/Button';
-import saveFileContents from '@/api/server/files/saveFileContents';
+import updateFileContents from '@/api/server/files/updateFileContents';
 import FlashMessageRender from '@/components/FlashMessageRender';
 import useFlash from '@/plugins/useFlash';
 import { SocketEvent, SocketRequest } from '@/components/server/events';
@@ -36,7 +36,7 @@ const EulaModalFeature = () => {
         setLoading(true);
         clearFlashes('feature:eula');
 
-        saveFileContents(uuid, 'eula.txt', 'eula=true')
+        updateFileContents(uuid, 'eula.txt', 'eula=true')
             .then(() => {
                 if (status === 'offline' && instance) {
                     instance.send(SocketRequest.SET_STATE, 'restart');
