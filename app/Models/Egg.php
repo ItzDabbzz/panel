@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use LogicException;
 
 /**
  * @property int $id
@@ -44,7 +45,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $inherit_config_startup
  * @property string|null $inherit_config_logs
  * @property string|null $inherit_config_stop
- * @property string $inherit_file_denylist
+ * @property array|null $inherit_file_denylist
  * @property array|null $inherit_features
  * @property Nest $nest
  * @property Collection|Server[] $servers
@@ -210,11 +211,7 @@ class Egg extends Model implements Identifiable
      */
     public function getInheritConfigFilesAttribute(): ?string
     {
-        if (! is_null($this->config_files) || is_null($this->config_from)) {
-            return $this->config_files;
-        }
-
-        return $this->configFrom->config_files;
+        return $this->resolveInheritedAttribute('config_files');
     }
 
     /**
@@ -222,11 +219,7 @@ class Egg extends Model implements Identifiable
      */
     public function getInheritConfigStartupAttribute(): ?string
     {
-        if (! is_null($this->config_startup) || is_null($this->config_from)) {
-            return $this->config_startup;
-        }
-
-        return $this->configFrom->config_startup;
+        return $this->resolveInheritedAttribute('config_startup');
     }
 
     /**
@@ -234,11 +227,7 @@ class Egg extends Model implements Identifiable
      */
     public function getInheritConfigLogsAttribute(): ?string
     {
-        if (! is_null($this->config_logs) || is_null($this->config_from)) {
-            return $this->config_logs;
-        }
-
-        return $this->configFrom->config_logs;
+        return $this->resolveInheritedAttribute('config_logs');
     }
 
     /**
@@ -246,11 +235,7 @@ class Egg extends Model implements Identifiable
      */
     public function getInheritConfigStopAttribute(): ?string
     {
-        if (! is_null($this->config_stop) || is_null($this->config_from)) {
-            return $this->config_stop;
-        }
-
-        return $this->configFrom->config_stop;
+        return $this->resolveInheritedAttribute('config_stop');
     }
 
     /**
@@ -259,11 +244,7 @@ class Egg extends Model implements Identifiable
      */
     public function getInheritFeaturesAttribute(): ?array
     {
-        if (! is_null($this->features) || is_null($this->config_from)) {
-            return $this->features;
-        }
-
-        return $this->configFrom->features;
+        return $this->resolveInheritedAttribute('features');
     }
 
     /**
@@ -272,11 +253,28 @@ class Egg extends Model implements Identifiable
      */
     public function getInheritFileDenylistAttribute(): ?array
     {
-        if (is_null($this->config_from)) {
-            return $this->file_denylist;
+        return $this->resolveInheritedAttribute('file_denylist', true);
+    }
+
+    private function resolveInheritedAttribute(string $attribute, bool $alwaysInherit = false): mixed
+    {
+        $egg = $this;
+        $visited = [];
+
+        while (! is_null($egg->config_from) && ($alwaysInherit || is_null($egg->{$attribute}))) {
+            $key = $egg->id === null ? 'object:'.spl_object_id($egg) : 'id:'.$egg->id;
+            if (isset($visited[$key])) {
+                throw new LogicException('Egg configuration inheritance contains a cycle.');
+            }
+
+            $visited[$key] = true;
+            $egg = $egg->configFrom;
+            if ($egg === null) {
+                throw new LogicException('Egg configuration parent does not exist.');
+            }
         }
 
-        return $this->configFrom->file_denylist;
+        return $egg->{$attribute};
     }
 
     /**
