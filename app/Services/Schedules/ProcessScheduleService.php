@@ -70,7 +70,7 @@ class ProcessScheduleService
 
         if (! $now) {
             try {
-                $this->dispatcher->dispatch($job->delay($task->time_offset));
+                $this->dispatcher->dispatch($job);
             } catch (Throwable $exception) {
                 $this->connection->transaction(function () use ($schedule, $task, $nextRunAt, $processingToken) {
                     // Only recover this execution; a newer run or a completed sync job owns its state.

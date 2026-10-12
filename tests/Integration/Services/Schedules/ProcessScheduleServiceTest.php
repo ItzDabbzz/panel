@@ -228,10 +228,10 @@ class ProcessScheduleServiceTest extends IntegrationTestCase
     }
 
     /**
-     * Test that a job is dispatched as expected using the initial delay.
+     * Test that the first task's offset is ignored for both automatic and manual runs.
      */
     #[DataProvider('dispatchNowDataProvider')]
-    public function test_job_can_be_dispatched_with_expected_initial_delay(bool $now)
+    public function test_first_task_is_dispatched_without_delay(bool $now)
     {
         Bus::fake();
 
@@ -241,15 +241,14 @@ class ProcessScheduleServiceTest extends IntegrationTestCase
         $schedule = Schedule::factory()->create(['server_id' => $server->id]);
 
         /** @var Task $task */
-        $task = Task::factory()->create(['schedule_id' => $schedule->id, 'time_offset' => 10, 'sequence_id' => 1]);
+        $task = Task::factory()->create(['schedule_id' => $schedule->id, 'time_offset' => 120, 'sequence_id' => 1]);
 
         $this->getService()->handle($schedule, $now);
 
-        Bus::assertDispatched(RunTaskJob::class, function ($job) use ($now, $task) {
+        Bus::assertDispatched(RunTaskJob::class, function ($job) use ($task) {
             $this->assertInstanceOf(RunTaskJob::class, $job);
             $this->assertSame($task->id, $job->task->id);
-            // Jobs using dispatchNow should not have a delay associated with them.
-            $this->assertSame($now ? null : 10, $job->delay);
+            $this->assertNull($job->delay);
 
             return true;
         });
@@ -274,12 +273,14 @@ class ProcessScheduleServiceTest extends IntegrationTestCase
 
         /** @var Task $task */
         $task2 = Task::factory()->create(['schedule_id' => $schedule->id, 'sequence_id' => 4]);
-        $task = Task::factory()->create(['schedule_id' => $schedule->id, 'sequence_id' => 2]);
+        $task = Task::factory()->create(['schedule_id' => $schedule->id, 'sequence_id' => 2, 'time_offset' => 120]);
         $task3 = Task::factory()->create(['schedule_id' => $schedule->id, 'sequence_id' => 3]);
 
         $this->getService()->handle($schedule);
 
         Bus::assertDispatched(RunTaskJob::class, function (RunTaskJob $job) use ($task) {
+            $this->assertNull($job->delay);
+
             return $task->id === $job->task->id;
         });
 
