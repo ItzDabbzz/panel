@@ -31,13 +31,13 @@ const JavaVersionModalFeature = () => {
     const { instance } = ServerContext.useStoreState((state) => state.socket);
 
     const { data, isValidating, mutate } = getServerStartup(uuid, null, { revalidateOnMount: false });
+    const images = Object.values(data?.dockerImages || {});
+    const selectedImage = images.includes(selectedVersion) ? selectedVersion : images[0] || '';
 
     useEffect(() => {
         if (!visible) return;
 
-        mutate().then((value) => {
-            setSelectedVersion(Object.values(value?.dockerImages || [])[0] || '');
-        });
+        mutate();
     }, [visible]);
 
     useWebsocketEvent(SocketEvent.CONSOLE_OUTPUT, (data) => {
@@ -49,10 +49,12 @@ const JavaVersionModalFeature = () => {
     });
 
     const updateJava = () => {
+        if (!selectedImage) return;
+
         setLoading(true);
         clearFlashes('feature:javaVersion');
 
-        setSelectedDockerImage(uuid, selectedVersion)
+        setSelectedDockerImage(uuid, selectedImage)
             .then(() => {
                 if (status === 'offline' && instance) {
                     instance.send(SocketRequest.SET_STATE, 'restart');
@@ -85,7 +87,11 @@ const JavaVersionModalFeature = () => {
             <Can action={'startup.docker-image'}>
                 <div className='mt-4'>
                     <InputSpinner visible={!data || isValidating}>
-                        <Select disabled={!data} onChange={(e) => setSelectedVersion(e.target.value)}>
+                        <Select
+                            value={selectedImage}
+                            disabled={!selectedImage}
+                            onChange={(e) => setSelectedVersion(e.target.value)}
+                        >
                             {!data ? (
                                 <option disabled />
                             ) : (
@@ -104,7 +110,7 @@ const JavaVersionModalFeature = () => {
                     Cancel
                 </Button>
                 <Can action={'startup.docker-image'}>
-                    <Button onClick={updateJava} className='w-full sm:w-auto'>
+                    <Button disabled={!selectedImage} onClick={updateJava} className='w-full sm:w-auto'>
                         Update Docker Image
                     </Button>
                 </Can>
