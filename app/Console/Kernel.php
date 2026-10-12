@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Console\Commands\Eggs\RefreshEggCatalogCommand;
 use App\Console\Commands\Maintenance\CleanServiceBackupFilesCommand;
 use App\Console\Commands\Maintenance\PruneOrphanedBackupsCommand;
 use App\Console\Commands\Schedule\ProcessRunnableCommand;
@@ -54,6 +55,8 @@ class Kernel extends ConsoleKernel
         if (config('webhooks.prune_days')) {
             $schedule->command(PruneCommand::class, ['--model' => [WebhookDelivery::class]])->daily();
         }
+
+        $schedule->command(RefreshEggCatalogCommand::class)->everyThirtyMinutes()->withoutOverlapping();
 
         $schedule->command('server:capture-stats')->everyTenMinutes();
         $schedule->job(new RefreshUserActivityLocationsJob())->everyTenMinutes()->withoutOverlapping();

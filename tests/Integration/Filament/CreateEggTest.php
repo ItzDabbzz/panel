@@ -44,7 +44,9 @@ class CreateEggTest extends IntegrationTestCase
                 ->assertHasNoFormErrors()
                 ->assertRedirect();
 
-            $this->assertSame($nest->id, Egg::query()->where('name', $name)->sole()->nest_id);
+            $egg = Egg::query()->where('name', $name)->sole();
+            $this->assertSame($nest->id, $egg->nest_id);
+            $this->assertSame('Created', $egg->creation_source_label);
         }
     }
 

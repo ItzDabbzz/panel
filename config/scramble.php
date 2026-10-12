@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\ApiDocAccess;
+use Dedoc\Scramble\SecurityDocumentation\MiddlewareAuthSecurityStrategy;
 
 return [
     /*
@@ -178,6 +179,6 @@ return [
      *     ],
      * ],
      */
-    'security_strategy' => \Dedoc\Scramble\SecurityDocumentation\MiddlewareAuthSecurityStrategy::class,
+    'security_strategy' => MiddlewareAuthSecurityStrategy::class,
     // 'security_strategy' => null,
 ];

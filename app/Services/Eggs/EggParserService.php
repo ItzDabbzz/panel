@@ -24,11 +24,30 @@ class EggParserService
 
         /** @var array $parsed */
         $parsed = json_decode($file->openFile()->fread($file->getSize()), true, 512, JSON_THROW_ON_ERROR);
-        if (! in_array(Arr::get($parsed, 'meta.version') ?? '', Egg::VERSIONS)) {
+        if (! is_array($parsed) || ! is_array($parsed['meta'] ?? null)
+            || ! in_array($parsed['meta']['version'] ?? '', Egg::VERSIONS, true)) {
             throw new InvalidFileUploadException('The JSON file provided is not in a format that can be recognized.');
         }
 
-        $duplicates = Collection::make($parsed['variables'] ?? [])->pluck('env_variable')->duplicatesStrict();
+        foreach (['config', 'scripts', 'docker_images', 'images', 'features', 'file_denylist'] as $field) {
+            if (isset($parsed[$field]) && ! is_array($parsed[$field])) {
+                throw new InvalidFileUploadException(trans('admin/catalog.errors.definition'));
+            }
+        }
+        if (isset($parsed['scripts']['installation']) && ! is_array($parsed['scripts']['installation'])) {
+            throw new InvalidFileUploadException(trans('admin/catalog.errors.definition'));
+        }
+        $parsed['variables'] ??= [];
+        if (! is_array($parsed['variables']) || ! array_is_list($parsed['variables'])) {
+            throw new InvalidFileUploadException(trans('admin/catalog.errors.definition'));
+        }
+        foreach ($parsed['variables'] as $variable) {
+            if (! is_array($variable) || ! is_string($variable['env_variable'] ?? null)) {
+                throw new InvalidFileUploadException(trans('admin/catalog.errors.definition'));
+            }
+        }
+
+        $duplicates = Collection::make($parsed['variables'])->pluck('env_variable')->duplicatesStrict();
         if ($duplicates->isNotEmpty()) {
             throw new InvalidFileUploadException(trans('exceptions.service.variables.env_not_unique', ['name' => $duplicates->first()]));
         }
@@ -83,6 +102,9 @@ class EggParserService
 
         $parsed['docker_images'] = [];
         foreach ($images as $image) {
+            if (! is_string($image)) {
+                throw new InvalidFileUploadException(trans('admin/catalog.errors.definition'));
+            }
             $parsed['docker_images'][$image] = $image;
         }
 
