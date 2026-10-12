@@ -63,6 +63,29 @@ class RunTaskJobTest extends IntegrationTestCase
     }
 
     #[DataProvider('isManualRunDataProvider')]
+    public function test_later_task_keeps_its_offset(bool $isManualRun)
+    {
+        Bus::fake();
+        $server = $this->createServerModel();
+        $schedule = Schedule::factory()->create(['server_id' => $server->id, 'is_active' => true, 'is_processing' => true]);
+        $first = Task::factory()->create(['schedule_id' => $schedule->id, 'sequence_id' => 1, 'action' => Task::ACTION_POWER, 'payload' => 'start', 'is_queued' => true]);
+        $second = Task::factory()->create(['schedule_id' => $schedule->id, 'sequence_id' => 2, 'time_offset' => 120]);
+        $this->mock(DaemonPowerRepository::class, function ($mock) {
+            $mock->expects('setServer')->andReturnSelf();
+            $mock->expects('send')->with('start')->andReturn(new Response());
+        });
+
+        $this->app->call([new RunTaskJob($first, $isManualRun), 'handle']);
+
+        Bus::assertDispatched(RunTaskJob::class, function (RunTaskJob $job) use ($second, $isManualRun) {
+            return $job->task->id === $second->id && $job->delay === 120 && $job->manualRun === $isManualRun;
+        });
+        $this->assertFalse($first->refresh()->is_queued);
+        $this->assertTrue($second->refresh()->is_queued);
+        $this->assertTrue($schedule->refresh()->is_processing);
+    }
+
+    #[DataProvider('isManualRunDataProvider')]
     public function test_job_is_executed(bool $isManualRun)
     {
         $server = $this->createServerModel();
