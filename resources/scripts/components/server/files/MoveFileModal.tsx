@@ -76,11 +76,17 @@ const MoveFileModal = ({ files, directoryNames = [], ...props }: Props) => {
             return;
         }
 
+        let active = true;
+        setEntries([]);
         setIsLoadingEntries(true);
         clearFlashes('files:move-modal');
 
         loadDirectory(uuid, destinationDirectory)
             .then((data) => {
+                if (!active) {
+                    return;
+                }
+
                 setEntries(
                     [...data].sort((a, b) => {
                         if (a.isFile !== b.isFile) {
@@ -91,8 +97,20 @@ const MoveFileModal = ({ files, directoryNames = [], ...props }: Props) => {
                     }),
                 );
             })
-            .catch((error) => clearAndAddHttpError({ key: 'files:move-modal', error }))
-            .then(() => setIsLoadingEntries(false));
+            .catch((error) => {
+                if (active) {
+                    clearAndAddHttpError({ key: 'files:move-modal', error });
+                }
+            })
+            .then(() => {
+                if (active) {
+                    setIsLoadingEntries(false);
+                }
+            });
+
+        return () => {
+            active = false;
+        };
     }, [props.visible, destinationDirectory, uuid]);
 
     const title = useMemo(() => {
