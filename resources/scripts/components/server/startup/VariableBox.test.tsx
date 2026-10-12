@@ -4,18 +4,26 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ServerEggVariable } from '@/api/server/types';
 import VariableBox from './VariableBox';
 
-const mocks = vi.hoisted(() => ({ update: vi.fn(), mutate: vi.fn(), canEdit: true }));
+const mocks = vi.hoisted(() => ({
+    update: vi.fn(),
+    mutate: vi.fn(),
+    canEdit: true,
+    clearFlashes: vi.fn(),
+    addError: vi.fn(),
+}));
 vi.mock('@/api/server/updateStartupVariable', () => ({ default: mocks.update }));
 vi.mock('@/api/swr/getServerStartup', () => ({ default: () => ({ mutate: mocks.mutate }) }));
 vi.mock('@/state/server', () => ({ ServerContext: { useStoreState: () => 'server-uuid' } }));
 vi.mock('@/plugins/usePermissions', () => ({ usePermissions: () => [mocks.canEdit] }));
 vi.mock('@/plugins/useFlash', () => ({
-    default: () => ({ clearFlashes: vi.fn(), clearAndAddHttpError: vi.fn() }),
+    default: () => ({ clearFlashes: mocks.clearFlashes, clearAndAddHttpError: mocks.addError }),
 }));
 vi.mock('react-i18next', () => ({ useTranslation: () => ({ t: (key: string) => key }) }));
 vi.mock('@/components/FlashMessageRender', () => ({ default: () => null }));
 vi.mock('@/reviactyl/elements/InputSpinner', () => ({
-    default: ({ children }: { children: ReactNode }) => children,
+    default: ({ children, visible }: { children: ReactNode; visible: boolean }) => (
+        <div data-loading={visible}>{children}</div>
+    ),
 }));
 
 let container: HTMLDivElement;
@@ -36,6 +44,7 @@ beforeEach(() => {
     mocks.update.mockReset().mockResolvedValue([variable, 'startup']);
     mocks.mutate.mockReset();
     mocks.canEdit = true;
+    mocks.addError.mockReset();
     container = document.createElement('div');
     root = createRoot(container);
 });
@@ -95,6 +104,93 @@ describe('startup boolean switch representation', () => {
         expect(input.checked).toBe(true);
         expect(input.disabled).toBe(true);
         await toggle(input);
+        expect(mocks.update).not.toHaveBeenCalled();
+    });
+});
+
+const deferred = () => {
+    let resolve!: (value: [ServerEggVariable, string]) => void;
+    let reject!: (error: Error) => void;
+    const promise = new Promise<[ServerEggVariable, string]>((res, rej) => {
+        resolve = res;
+        reject = rej;
+    });
+    return { promise, resolve, reject };
+};
+
+describe('startup save response ordering', () => {
+    it('keeps the latest variable and invocation when responses arrive in reverse order', async () => {
+        const older = deferred();
+        const newer = deferred();
+        mocks.update.mockReset().mockReturnValueOnce(older.promise).mockReturnValueOnce(newer.promise);
+        let cached = { variables: [variable], invocation: 'initial' };
+        mocks.mutate.mockImplementation((updater) => {
+            cached = updater(cached);
+        });
+        const input = await render({ serverValue: 'false' });
+        await toggle(input);
+        await toggle(input);
+        await act(async () => newer.resolve([{ ...variable, serverValue: 'false' }, 'newer']));
+        await act(async () => older.resolve([{ ...variable, serverValue: 'true' }, 'older']));
+        expect(input.checked).toBe(false);
+        expect(cached.variables[0]?.serverValue).toBe('false');
+        expect(cached.invocation).toBe('newer');
+    });
+
+    it('does not clear loading or show errors for an obsolete save', async () => {
+        const older = deferred();
+        const newer = deferred();
+        mocks.update.mockReset().mockReturnValueOnce(older.promise).mockReturnValueOnce(newer.promise);
+        const input = await render({ serverValue: 'false' });
+        await toggle(input);
+        await toggle(input);
+        const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+        await act(async () => older.reject(new Error('obsolete')));
+        expect(mocks.addError).not.toHaveBeenCalled();
+        expect(container.querySelector('[data-loading]')?.getAttribute('data-loading')).toBe('true');
+        await act(async () => newer.resolve([variable, 'newer']));
+        expect(container.querySelector('[data-loading]')?.getAttribute('data-loading')).toBe('false');
+        consoleError.mockRestore();
+    });
+
+    it('invalidates a response as soon as another edit is waiting for debounce', async () => {
+        const older = deferred();
+        mocks.update.mockReset().mockReturnValueOnce(older.promise).mockResolvedValue([variable, 'newer']);
+        const input = await render({ serverValue: 'false' });
+        await toggle(input);
+        await act(async () => input.click());
+        await act(async () => older.resolve([{ ...variable, serverValue: 'true' }, 'older']));
+        expect(mocks.mutate).not.toHaveBeenCalled();
+        await act(async () => vi.advanceTimersByTimeAsync(500));
+        expect(mocks.update).toHaveBeenCalledTimes(2);
+    });
+
+    it('coalesces edits across rerenders and reports the current save error', async () => {
+        const pending = deferred();
+        mocks.update.mockReset().mockReturnValue(pending.promise);
+        const input = await render({ serverValue: 'false' });
+        await act(async () => input.click());
+        await act(async () => vi.advanceTimersByTimeAsync(250));
+        await render({ serverValue: 'false', description: 'Updated description' });
+        await act(async () => input.click());
+        await act(async () => vi.advanceTimersByTimeAsync(250));
+        expect(mocks.update).not.toHaveBeenCalled();
+        await act(async () => vi.advanceTimersByTimeAsync(250));
+        expect(mocks.update).toHaveBeenCalledTimes(1);
+        expect(mocks.update).toHaveBeenCalledWith('server-uuid', 'BOOLEAN_VALUE', 'false');
+        const error = new Error('current');
+        const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+        await act(async () => pending.reject(error));
+        expect(mocks.addError).toHaveBeenCalledWith({ error, key: 'server:startup:BOOLEAN_VALUE' });
+        expect(container.querySelector('[data-loading]')?.getAttribute('data-loading')).toBe('false');
+        consoleError.mockRestore();
+    });
+
+    it('cancels pending debounced saves on unmount', async () => {
+        const input = await render({ serverValue: 'false' });
+        await act(async () => input.click());
+        await act(async () => root.render(null));
+        await act(async () => vi.advanceTimersByTimeAsync(500));
         expect(mocks.update).not.toHaveBeenCalled();
     });
 });

@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { ServerEggVariable } from '@/api/server/types';
 import TitledGreyBox from '@/reviactyl/elements/TitledGreyBox';
 import { usePermissions } from '@/plugins/usePermissions';
@@ -29,30 +29,56 @@ const VariableBox = ({ variable }: Props) => {
     const { clearFlashes, clearAndAddHttpError } = useFlash();
     const { mutate } = getServerStartup(uuid);
 
-    const setVariableValue = debounce((value: string) => {
-        setLoading(true);
-        clearFlashes(FLASH_KEY);
+    const revision = useRef(0);
+    const saveVariableValue = useMemo(
+        () =>
+            debounce((value: string, requestRevision: number) => {
+                setLoading(true);
+                clearFlashes(FLASH_KEY);
 
-        updateStartupVariable(uuid, variable.envVariable, value)
-            .then(([response, invocation]) =>
-                mutate(
-                    (data) =>
-                        data && {
-                            ...data,
-                            invocation,
-                            variables: data.variables.map((v) =>
-                                v.envVariable === response.envVariable ? response : v,
-                            ),
-                        },
-                    false,
-                ),
-            )
-            .catch((error) => {
-                console.error(error);
-                clearAndAddHttpError({ error, key: FLASH_KEY });
-            })
-            .then(() => setLoading(false));
-    }, 500);
+                updateStartupVariable(uuid, variable.envVariable, value)
+                    .then(([response, invocation]) => {
+                        if (requestRevision !== revision.current) return;
+
+                        return mutate(
+                            (data) =>
+                                data && requestRevision === revision.current
+                                    ? {
+                                          ...data,
+                                          invocation,
+                                          variables: data.variables.map((v) =>
+                                              v.envVariable === response.envVariable ? response : v,
+                                          ),
+                                      }
+                                    : data,
+                            false,
+                        );
+                    })
+                    .catch((error) => {
+                        if (requestRevision !== revision.current) return;
+
+                        console.error(error);
+                        clearAndAddHttpError({ error, key: FLASH_KEY });
+                    })
+                    .then(() => {
+                        if (requestRevision === revision.current) setLoading(false);
+                    });
+            }, 500),
+        [uuid, variable.envVariable, mutate, clearFlashes, clearAndAddHttpError, FLASH_KEY],
+    );
+
+    useEffect(
+        () => () => {
+            saveVariableValue.clear();
+            revision.current += 1;
+        },
+        [saveVariableValue],
+    );
+
+    const setVariableValue = (value: string) => {
+        revision.current += 1;
+        saveVariableValue(value, revision.current);
+    };
 
     const useSwitch = variable.rules.some(
         (v) => v === 'boolean' || v === 'in:0,1' || v === 'in:1,0' || v === 'in:true,false' || v === 'in:false,true',
