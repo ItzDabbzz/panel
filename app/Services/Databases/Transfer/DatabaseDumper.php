@@ -192,21 +192,24 @@ class DatabaseDumper
     private function definitions(PDO $connection, string $type, array $names, int $column): \Generator
     {
         foreach ($names as $name) {
-            $definition = $connection->query("SHOW CREATE $type ".$this->identifier($name))->fetch()[$column] ?? null;
+            $row = $connection->query("SHOW CREATE $type ".$this->identifier($name))->fetch(PDO::FETCH_NUM);
+            $definition = $row[$column] ?? null;
 
             if (empty($definition)) {
                 throw new \PDOException(sprintf('The definition of the %s %s could not be read.', strtolower($type), $name));
             }
 
             yield "DROP $type IF EXISTS ".$this->identifier($name);
+            yield 'SET SQL_MODE = '.$this->string($row[1]);
             yield $this->withoutDefiner($definition);
+            yield "SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO'";
         }
     }
 
     private function withoutDefiner(string $statement): string
     {
         return preg_replace(
-            '/\sDEFINER\s*=\s*(`[^`]*`|\'[^\']*\'|[\w%.\-]+)@(`[^`]*`|\'[^\']*\'|[\w%.\-]+)/i',
+            '/\sDEFINER\s*=\s*(`[^`]*`|"(?:""|[^"])*"|\'[^\']*\'|[\w%.\-]+)@(`[^`]*`|"(?:""|[^"])*"|\'[^\']*\'|[\w%.\-]+)/i',
             '',
             $statement,
             1

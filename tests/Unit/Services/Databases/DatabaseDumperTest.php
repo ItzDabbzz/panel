@@ -93,10 +93,10 @@ class DatabaseDumperTest extends TestCase
             'SHOW CREATE TABLE `numbers`' => [1 => 'CREATE TABLE `numbers` (`n` INT)'],
             'SHOW CREATE VIEW `a_nested`' => [1 => 'CREATE VIEW `a_nested` AS SELECT * FROM `z_function_view`'],
             'SHOW CREATE VIEW `z_function_view`' => [1 => 'CREATE VIEW `z_function_view` AS SELECT double_number(n) FROM `numbers`'],
-            'SHOW CREATE FUNCTION `double_number`' => [2 => 'CREATE FUNCTION double_number(n INT) RETURNS INT RETURN n * 2'],
-            'SHOW CREATE PROCEDURE `read_numbers`' => [2 => 'CREATE PROCEDURE read_numbers() SELECT double_number(n) FROM numbers'],
-            'SHOW CREATE TRIGGER `numbers_trigger`' => [2 => 'CREATE TRIGGER numbers_trigger BEFORE INSERT ON numbers FOR EACH ROW SET NEW.n = double_number(NEW.n)'],
-            'SHOW CREATE EVENT `refresh_numbers`' => [3 => 'CREATE EVENT refresh_numbers ON SCHEDULE EVERY 1 DAY DO CALL read_numbers()'],
+            'SHOW CREATE FUNCTION `double_number`' => [1 => 'PIPES_AS_CONCAT,ANSI_QUOTES', 2 => 'CREATE DEFINER="root"@"%" FUNCTION double_number(n INT) RETURNS INT RETURN n * 2'],
+            'SHOW CREATE PROCEDURE `read_numbers`' => [1 => 'ANSI_QUOTES', 2 => 'CREATE DEFINER="root"@"%" PROCEDURE read_numbers() SELECT double_number(n) FROM numbers'],
+            'SHOW CREATE TRIGGER `numbers_trigger`' => [1 => '', 2 => 'CREATE TRIGGER numbers_trigger BEFORE INSERT ON numbers FOR EACH ROW SET NEW.n = double_number(NEW.n)'],
+            'SHOW CREATE EVENT `refresh_numbers`' => [1 => 'NO_BACKSLASH_ESCAPES', 3 => 'CREATE EVENT refresh_numbers ON SCHEDULE EVERY 1 DAY DO CALL read_numbers()'],
         ];
         foreach ($definitions as $query => $definition) {
             $result = Mockery::mock(PDOStatement::class);
@@ -111,13 +111,21 @@ class DatabaseDumperTest extends TestCase
 
         $statements = iterator_to_array((new DatabaseDumper())->statements($connection), false);
         $position = function (string $query) use ($definitions, $statements): int {
-            $index = array_search($definitions[$query][array_key_first($definitions[$query])], $statements, true);
+            $index = array_search(str_replace(' DEFINER="root"@"%"', '', end($definitions[$query])), $statements, true);
             $this->assertNotFalse($index, 'The dump is missing the definition from '.$query);
 
             return $index;
         };
         $insert = array_search("INSERT INTO `numbers` (`n`) VALUES \n(21)", $statements, true);
         $this->assertNotFalse($insert, 'The dump is missing the table rows.');
+
+        foreach (['FUNCTION', 'PROCEDURE', 'TRIGGER', 'EVENT'] as $type) {
+            $query = array_values(array_filter(array_keys($definitions), fn (string $query) => str_starts_with($query, 'SHOW CREATE '.$type)))[0];
+            $index = $position($query);
+            $this->assertTrue((new DatabaseDumper())->isCompound($statements[$index]));
+            $this->assertSame("SET SQL_MODE = '".$definitions[$query][1]."'", $statements[$index - 1]);
+            $this->assertSame("SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO'", $statements[$index + 1]);
+        }
 
         $this->assertLessThan($position('SHOW CREATE VIEW `z_function_view`'), $position('SHOW CREATE FUNCTION `double_number`'));
         $this->assertLessThan($position('SHOW CREATE PROCEDURE `read_numbers`'), $position('SHOW CREATE FUNCTION `double_number`'));
