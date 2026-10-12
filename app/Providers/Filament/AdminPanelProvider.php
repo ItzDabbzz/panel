@@ -30,6 +30,8 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->spa(fn (): bool => ! request()->routeIs('filament.admin.pages.designify'))
+            ->spaUrlExceptions(fn (): array => [route('filament.admin.pages.designify')])
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->homeUrl('/admin')
             ->brandLogo(config('app.logo', '/reviactyl/logo.png'))
