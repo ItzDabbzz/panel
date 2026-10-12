@@ -59,3 +59,10 @@ jobs:
       - run: pnpm lint
       - run: pnpm test
       - run: pnpm build
+      - run: php artisan filament:assets
+        env:
+          APP_KEY: SomeRandomString3232RandomString
+          CACHE_STORE: array
+          REDIS_CLIENT: predis
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:browser

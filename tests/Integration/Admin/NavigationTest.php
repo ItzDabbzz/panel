@@ -18,7 +18,7 @@ class NavigationTest extends IntegrationTestCase
             ->assertDontSee('href="'.url('/admin/designify').'" wire:navigate', false);
     }
 
-    public function test_designify_keeps_full_navigation_for_its_unsaved_changes_warning(): void
+    public function test_designify_navigation_uses_full_page_loads(): void
     {
         $this->actingAs(User::factory()->create(['root_admin' => true]));
 

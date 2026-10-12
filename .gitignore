@@ -28,6 +28,8 @@ docker-compose.yml
 misc
 .php-cs-fixer.cache
 coverage.xml
+/test-results/
+/playwright-report/
 lang/locales.js
 .phpunit.result.cache
 

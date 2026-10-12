@@ -53,7 +53,9 @@
     "include": [
       "./resources/scripts/**/*", 
       "./extensions/**/*",
-      "vite.config.ts"
+      "vite.config.ts",
+      "playwright.config.ts",
+      "./tests/Browser/**/*.ts"
     ],
     "exclude": [
       "node_modules"
