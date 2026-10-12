@@ -35,7 +35,7 @@ class StartupController extends ClientApiController
         $startup = $this->startupCommandService->handle($server);
 
         return $this->fractal->collection(
-            $server->variables()->where('user_viewable', true)->get()
+            $server->variables->keyBy('env_variable')->filter(fn ($variable) => $variable->user_viewable)->values()
         )
             ->transformWith($this->getTransformer(EggVariableTransformer::class))
             ->addMeta([
@@ -55,7 +55,7 @@ class StartupController extends ClientApiController
      */
     public function update(UpdateStartupVariableRequest $request, Server $server): array
     {
-        $variable = $server->variables()->where('env_variable', $request->input('key'))->first();
+        $variable = $server->variables->last(fn ($variable) => $variable->env_variable === $request->input('key'));
 
         if (is_null($variable) || ! $variable->user_viewable) {
             throw new BadRequestHttpException('The environment variable you are trying to edit does not exist.');
@@ -78,6 +78,7 @@ class StartupController extends ClientApiController
         $variable = $variable->refresh();
         $variable->server_value = $request->input('value');
 
+        $server->unsetRelation('variables');
         $startup = $this->startupCommandService->handle($server);
 
         if ($original !== $request->input('value')) {
