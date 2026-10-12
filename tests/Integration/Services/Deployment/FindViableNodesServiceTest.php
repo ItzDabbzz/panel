@@ -220,6 +220,35 @@ class FindViableNodesServiceTest extends IntegrationTestCase
         ];
     }
 
+    #[DataProvider('deploymentPagination')]
+    public function test_maintenance_nodes_are_excluded_from_deployment(?int $page): void
+    {
+        $location = Location::factory()->create();
+        Node::factory()->create(['location_id' => $location->id, 'maintenance_mode' => true]);
+        Node::factory()->create(['location_id' => $location->id, 'public' => false]);
+        $active = Node::factory()->create(['location_id' => $location->id, 'maintenance_mode' => false]);
+
+        $nodes = $this->getService()->setLocations([$location->id])->setMemory(512)->setDisk(512)->handle(50, $page);
+
+        $this->assertSame([$active->id], $nodes->pluck('id')->all());
+    }
+
+    #[DataProvider('deploymentPagination')]
+    public function test_no_viable_node_when_only_eligible_node_is_under_maintenance(?int $page): void
+    {
+        $location = Location::factory()->create();
+        Node::factory()->create(['location_id' => $location->id, 'maintenance_mode' => true]);
+
+        $this->expectException(NoViableNodeException::class);
+
+        $this->getService()->setLocations([$location->id])->setMemory(512)->setDisk(512)->handle(50, $page);
+    }
+
+    public static function deploymentPagination(): array
+    {
+        return ['collection' => [null], 'paginated' => [1]];
+    }
+
     private function getService(): FindViableNodesService
     {
         return $this->app->make(FindViableNodesService::class);

@@ -59,7 +59,7 @@ class FindViableNodesService
      * This functionality is used for automatic deployments of servers and will
      * attempt to find all nodes in the defined locations that meet the disk and
      * memory availability requirements. Any nodes not meeting those requirements
-     * are tossed out, as are any nodes marked as non-public, meaning automatic
+     * are tossed out, as are any nodes marked as non-public or under maintenance, meaning automatic
      * deployments should not be done against them.
      *
      * @param  int|null  $page  If provided the results will be paginated by returning
@@ -85,7 +85,8 @@ class FindViableNodesService
                 'server_usage',
                 fn ($join) => $join->on('server_usage.node_id', '=', 'nodes.id')
             )
-            ->where('nodes.public', 1);
+            ->where('nodes.public', 1)
+            ->where('nodes.maintenance_mode', false);
 
         if (! empty($this->locations)) {
             $query = $query->whereIn('nodes.location_id', $this->locations);
