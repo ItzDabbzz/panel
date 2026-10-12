@@ -64,6 +64,16 @@ class EditEgg extends EditRecord
 
                         $action->cancel();
                     }
+
+                    if (Egg::query()->where('config_from', $record->id)->exists()) {
+                        Notification::make()
+                            ->title(trans('admin/eggs.notices.cannot_delete'))
+                            ->body(trans('exceptions.nest.egg.has_children'))
+                            ->danger()
+                            ->send();
+
+                        $action->cancel();
+                    }
                 }),
         ];
     }

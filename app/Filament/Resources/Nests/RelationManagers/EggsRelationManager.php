@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Nests\RelationManagers;
 
 use App\Filament\Concerns\AuthorizesAdminRelation;
 use App\Filament\Resources\Nests\EggResource;
+use App\Models\Egg;
 use App\Models\Nest;
 use App\Services\Acl\RolePermission;
 use App\Services\Eggs\Sharing\EggExporterService;
@@ -89,6 +90,16 @@ class EggsRelationManager extends RelationManager
 
                             $action->cancel();
                         }
+
+                        if (Egg::query()->where('config_from', $record->id)->exists()) {
+                            Notification::make()
+                                ->title(trans('admin/eggs.notices.cannot_delete'))
+                                ->body(trans('exceptions.nest.egg.has_children'))
+                                ->danger()
+                                ->send();
+
+                            $action->cancel();
+                        }
                     }),
             ])
             ->bulkActions([
@@ -102,9 +113,18 @@ class EggsRelationManager extends RelationManager
                                 ->warning()
                                 ->send();
                         }
+
+                        if ($records->contains(fn ($record) => Egg::query()->where('config_from', $record->id)->exists())) {
+                            Notification::make()
+                                ->title(trans('admin/eggs.notices.cannot_delete'))
+                                ->body(trans('exceptions.nest.egg.has_children'))
+                                ->warning()
+                                ->send();
+                        }
                     })
                     ->action(function ($records) {
-                        $deletable = $records->filter(fn ($record) => $record->servers()->count() === 0);
+                        $deletable = $records->filter(fn ($record) => $record->servers()->count() === 0
+                            && ! Egg::query()->where('config_from', $record->id)->exists());
                         $deletable->each->delete();
                     }),
             ]);
