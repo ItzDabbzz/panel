@@ -125,7 +125,7 @@ describe('startup save response ordering', () => {
         mocks.update.mockReset().mockReturnValueOnce(older.promise).mockReturnValueOnce(newer.promise);
         let cached = { variables: [variable], invocation: 'initial' };
         mocks.mutate.mockImplementation((updater) => {
-            cached = updater(cached);
+            cached = updater ? updater(cached) : { ...cached, invocation: 'newer' };
         });
         const input = await render({ serverValue: 'false' });
         await toggle(input);
@@ -135,6 +135,33 @@ describe('startup save response ordering', () => {
         expect(input.checked).toBe(false);
         expect(cached.variables[0]?.serverValue).toBe('false');
         expect(cached.invocation).toBe('newer');
+    });
+
+    it('refreshes the shared command when different variables respond in reverse order', async () => {
+        const first = deferred();
+        const second = deferred();
+        const otherVariable = { ...variable, envVariable: 'OTHER_VALUE', serverValue: 'false' };
+        let cached = { variables: [{ ...variable, serverValue: 'false' }, otherVariable], invocation: 'false false' };
+        mocks.update.mockReset().mockReturnValueOnce(first.promise).mockReturnValueOnce(second.promise);
+        mocks.mutate.mockImplementation((updater) => {
+            cached = updater ? updater(cached) : { ...cached, invocation: 'true true' };
+        });
+        await act(async () =>
+            root.render(
+                <>
+                    <VariableBox variable={{ ...variable, serverValue: 'false' }} />
+                    <VariableBox variable={otherVariable} />
+                </>,
+            ),
+        );
+        const inputs = container.querySelectorAll<HTMLInputElement>('input[type="checkbox"]');
+        await toggle(inputs[0]!);
+        await toggle(inputs[1]!);
+        await act(async () => second.resolve([{ ...otherVariable, serverValue: 'true' }, 'true true']));
+        await act(async () => first.resolve([{ ...variable, serverValue: 'true' }, 'true false']));
+        expect(cached.variables.map((v) => v.serverValue)).toEqual(['true', 'true']);
+        expect(cached.invocation).toBe('true true');
+        expect(mocks.mutate.mock.calls.filter((args) => args.length === 0)).toHaveLength(2);
     });
 
     it('does not clear loading or show errors for an obsolete save', async () => {

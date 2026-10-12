@@ -37,15 +37,14 @@ const VariableBox = ({ variable }: Props) => {
                 clearFlashes(FLASH_KEY);
 
                 updateStartupVariable(uuid, variable.envVariable, value)
-                    .then(([response, invocation]) => {
+                    .then(async ([response]) => {
                         if (requestRevision !== revision.current) return;
 
-                        return mutate(
+                        await mutate(
                             (data) =>
                                 data && requestRevision === revision.current
                                     ? {
                                           ...data,
-                                          invocation,
                                           variables: data.variables.map((v) =>
                                               v.envVariable === response.envVariable ? response : v,
                                           ),
@@ -53,6 +52,8 @@ const VariableBox = ({ variable }: Props) => {
                                     : data,
                             false,
                         );
+
+                        if (requestRevision === revision.current) await mutate();
                     })
                     .catch((error) => {
                         if (requestRevision !== revision.current) return;
