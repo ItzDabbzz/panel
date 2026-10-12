@@ -28,6 +28,7 @@ return [
     'password' => '密码',
     'jdbc-connection-string' => 'JDBC 连接字符串',
     'importing' => '正在导入，目前已执行 {{statements}} 条语句',
+    'reading-source' => '正在读取源数据库，目前已保存 {{statements}} 条语句',
     'import-failed' => '导入失败',
     'import-completed' => '已完成向 {{name}} 的导入，共执行 {{statements}} 条语句。',
     'import-title' => '导入数据库',

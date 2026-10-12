@@ -28,6 +28,7 @@ return [
     'password' => 'Пароль',
     'jdbc-connection-string' => 'Строка подключения JDBC',
     'importing' => 'Импорт выполняется, выполнено запросов: {{statements}}',
+    'reading-source' => 'Чтение источника, сохранено запросов: {{statements}}',
     'import-failed' => 'Импорт не удался',
     'import-completed' => 'Импорт в {{name}} завершён, выполнено запросов: {{statements}}.',
     'import-title' => 'Импорт базы данных',

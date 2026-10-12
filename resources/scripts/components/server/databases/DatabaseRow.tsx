@@ -225,7 +225,9 @@ export default ({ database, className }: Props) => {
                     {importing && (
                         <p className='mt-1 flex items-center text-xs text-gray-300' role='status'>
                             <Spinner size={'small'} className='mr-2 !h-3 !w-3' />
-                            {t('importing', { statements: database.importStatus?.statements ?? 0 })}
+                            {database.importStatus?.phase === 'capturing'
+                                ? t('reading-source', { statements: database.importStatus.capturedStatements ?? 0 })
+                                : t('importing', { statements: database.importStatus?.statements ?? 0 })}
                         </p>
                     )}
                     {importError && (

@@ -28,6 +28,7 @@ return [
     'password' => 'Password',
     'jdbc-connection-string' => 'JDBC Connection String',
     'importing' => 'Importing, {{statements}} statements run so far',
+    'reading-source' => 'Reading source, {{statements}} statements captured so far',
     'import-failed' => 'Import failed',
     'import-completed' => 'The import into {{name}} has completed, {{statements}} statements were run.',
     'import-title' => 'Import database',

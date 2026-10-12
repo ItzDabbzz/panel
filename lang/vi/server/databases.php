@@ -28,6 +28,7 @@ return [
     'password' => 'Mật khẩu',
     'jdbc-connection-string' => 'Chuỗi kết nối JDBC',
     'importing' => 'Đang nhập, đã chạy {{statements}} câu lệnh',
+    'reading-source' => 'Đang đọc nguồn, đã lưu {{statements}} câu lệnh',
     'import-failed' => 'Nhập thất bại',
     'import-completed' => 'Đã nhập xong vào {{name}}, {{statements}} câu lệnh đã được chạy.',
     'import-title' => 'Nhập cơ sở dữ liệu',

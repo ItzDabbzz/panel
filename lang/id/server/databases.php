@@ -28,6 +28,7 @@ return [
     'password' => 'Kata sandi',
     'jdbc-connection-string' => 'String Koneksi JDBC',
     'importing' => 'Mengimpor, {{statements}} pernyataan telah dijalankan sejauh ini',
+    'reading-source' => 'Membaca sumber, {{statements}} pernyataan telah disimpan sejauh ini',
     'import-failed' => 'Impor gagal',
     'import-completed' => 'Impor ke {{name}} telah selesai, {{statements}} pernyataan dijalankan.',
     'import-title' => 'Impor basis data',
