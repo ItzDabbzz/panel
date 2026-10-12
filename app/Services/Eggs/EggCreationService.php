@@ -24,6 +24,7 @@ class EggCreationService
      */
     public function handle(array $data): Egg
     {
+        unset($data['catalog_key'], $data['catalog_origin'], $data['creation_source']);
         $data['config_from'] = array_get($data, 'config_from');
         if (! is_null($data['config_from'])) {
             $results = $this->repository->findCountWhere([
@@ -37,6 +38,7 @@ class EggCreationService
         }
 
         return $this->repository->create(array_merge($data, [
+            'creation_source' => 'Created',
             'uuid' => Uuid::uuid4()->toString(),
             'author' => $this->config->get('panel.service.author'),
         ]), true, true);

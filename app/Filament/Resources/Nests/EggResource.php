@@ -314,6 +314,7 @@ class EggResource extends Resource
         return [
             'index' => Pages\ListEggs::route('/'),
             'create' => Pages\CreateEgg::route('/create'),
+            'catalog' => Pages\EggCatalog::route('/catalog'),
             'edit' => Pages\EditEgg::route('/{record}'),
         ];
     }

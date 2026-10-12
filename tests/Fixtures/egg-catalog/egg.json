@@ -1,0 +1,11 @@
+{
+    "meta": {"version": "PTDL_v2", "update_url": "https://untrusted.example/update.json"},
+    "name": "Paper",
+    "author": "fixtures@example.com",
+    "description": "A deterministic template",
+    "docker_images": {"Java": "ghcr.io/pterodactyl/yolks:java_21"},
+    "startup": "java -jar {{SERVER_JARFILE}}",
+    "config": {"files": "{}", "startup": "{\"done\":\"ready\"}", "logs": "{}", "stop": "stop"},
+    "scripts": {"installation": {"script": "#!/bin/sh\necho fixture", "container": "alpine:3.20", "entrypoint": "sh"}},
+    "variables": [{"name": "Jar file", "description": "Jar name", "env_variable": "SERVER_JARFILE", "default_value": "server.jar", "user_viewable": true, "user_editable": true, "rules": "required|string"}]
+}

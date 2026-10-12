@@ -36,6 +36,8 @@ class EggsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('creation_source_label')
+                    ->label(trans('admin/catalog.source')),
                 Tables\Columns\TextColumn::make('author')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('description')
@@ -44,6 +46,10 @@ class EggsRelationManager extends RelationManager
                     ->searchable(),
             ])
             ->headerActions([
+                Action::make('browseEggs')
+                    ->label(trans('admin/catalog.browse'))->icon('tabler-egg')->color('gray')
+                    ->authorize(fn (): bool => EggResource::canViewAny())
+                    ->url(fn (): string => EggResource::getUrl('catalog', ['nest_id' => $this->getOwnerRecord()->getKey()])),
                 Action::make('create')
                     ->label(trans('admin/eggs.actions.create'))
                     ->icon('heroicon-o-plus')

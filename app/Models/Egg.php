@@ -10,11 +10,16 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Validation\ValidationException;
 use LogicException;
 
 /**
  * @property int $id
  * @property string $uuid
+ * @property string|null $creation_source
+ * @property string $creation_source_label
+ * @property string|null $catalog_key
+ * @property array|null $catalog_origin
  * @property int $nest_id
  * @property string $author
  * @property string $name
@@ -124,6 +129,7 @@ class Egg extends Model implements Identifiable
      * Cast values to correct type.
      */
     protected $casts = [
+        'catalog_origin' => 'array',
         'nest_id' => 'integer',
         'config_from' => 'integer',
         'script_is_privileged' => 'boolean',
@@ -166,6 +172,28 @@ class Egg extends Model implements Identifiable
         'update_url' => null,
         'image' => null,
     ];
+
+    public function getCreationSourceLabelAttribute(): string
+    {
+        $provider = $this->catalog_origin['provider'] ?? null;
+        if (in_array($provider, ['Pterodactyl', 'Rextstore'], true)) {
+            return $provider;
+        }
+
+        return trans('admin/catalog.sources.'.(in_array($this->creation_source, ['Imported', 'Created'], true) ? strtolower($this->creation_source) : 'unknown'));
+    }
+
+    public function validate(): void
+    {
+        parent::validate();
+        if ($this->catalog_key !== null && $this->isDirty('nest_id') && static::query()
+            ->where('nest_id', $this->nest_id)->where('catalog_key', $this->catalog_key)
+            ->when($this->exists, fn ($query) => $query->where('id', '!=', $this->id))->exists()) {
+            throw ValidationException::withMessages([
+                'nest_id' => trans('admin/catalog.errors.move_conflict'),
+            ]);
+        }
+    }
 
     /**
      * Returns the install script for the egg; if egg is copying from another

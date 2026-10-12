@@ -23,6 +23,10 @@ class ListNests extends ListRecords
     {
         return [
             CreateAction::make(),
+            Action::make('browseEggs')
+                ->label(trans('admin/catalog.browse'))->icon('tabler-egg')->color('gray')
+                ->authorize(fn (): bool => EggResource::canViewAny())
+                ->url(EggResource::getUrl('catalog')),
             Action::make('import')
                 ->label(trans('admin/nests.actions.import'))
                 ->authorize(fn (): bool => EggResource::canCreate())
