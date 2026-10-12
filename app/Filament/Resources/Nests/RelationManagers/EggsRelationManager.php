@@ -114,7 +114,7 @@ class EggsRelationManager extends RelationManager
                                 ->send();
                         }
 
-                        if ($records->contains(fn ($record) => Egg::query()->where('config_from', $record->id)->exists())) {
+                        if (Egg::query()->whereIn('config_from', $records->modelKeys())->exists()) {
                             Notification::make()
                                 ->title(trans('admin/eggs.notices.cannot_delete'))
                                 ->body(trans('exceptions.nest.egg.has_children'))
@@ -123,8 +123,10 @@ class EggsRelationManager extends RelationManager
                         }
                     })
                     ->action(function ($records) {
+                        $parentIds = Egg::query()->whereIn('config_from', $records->modelKeys())
+                            ->distinct()->pluck('config_from')->flip();
                         $deletable = $records->filter(fn ($record) => $record->servers()->count() === 0
-                            && ! Egg::query()->where('config_from', $record->id)->exists());
+                            && ! $parentIds->has($record->id));
                         $deletable->each->delete();
                     }),
             ]);
