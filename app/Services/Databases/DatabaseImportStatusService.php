@@ -21,7 +21,7 @@ class DatabaseImportStatusService
     public function __construct(private CacheRepository $cache) {}
 
     /**
-     * @return array{state: string, statements: int, error: string|null, detail: string|null, started_at: string, finished_at: string|null}|null
+     * @return array{state: string, phase: string, captured_statements: int, statements: int, error: string|null, detail: string|null, started_at: string, finished_at: string|null}|null
      */
     public function get(Database $database): ?array
     {
@@ -57,6 +57,8 @@ class DatabaseImportStatusService
 
         $this->put($database, [
             'state' => self::STATE_RUNNING,
+            'phase' => 'importing',
+            'captured_statements' => 0,
             'statements' => 0,
             'error' => null,
             'detail' => null,
@@ -70,7 +72,19 @@ class DatabaseImportStatusService
         $status = $this->get($database);
 
         if (($status['state'] ?? null) === self::STATE_RUNNING) {
-            $this->put($database, array_merge($status, ['statements' => $statements]), ImportDatabaseJob::TIMEOUT + 60);
+            $this->put($database, array_merge($status, ['phase' => 'importing', 'statements' => $statements]), ImportDatabaseJob::TIMEOUT + 60);
+        }
+    }
+
+    public function captureProgress(Database $database, int $statements): void
+    {
+        $status = $this->get($database);
+
+        if (($status['state'] ?? null) === self::STATE_RUNNING) {
+            $this->put($database, array_merge($status, [
+                'phase' => 'capturing',
+                'captured_statements' => $statements,
+            ]), ImportDatabaseJob::TIMEOUT + 60);
         }
     }
 

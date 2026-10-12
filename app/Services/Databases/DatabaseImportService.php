@@ -88,11 +88,14 @@ class DatabaseImportService
     /**
      * @param  array{host: string, port: int, database: string, username: string, password: string|null}  $remote
      * @param  (\Closure(int): void)|null  $progress
+     * @param  (\Closure(int): void)|null  $captureProgress
      *
      * @throws DatabaseImportException
      */
-    public function fromRemote(Database $database, array $remote, bool $wipe = false, ?\Closure $progress = null): int
+    public function fromRemote(Database $database, array $remote, bool $wipe = false, ?\Closure $progress = null, ?\Closure $captureProgress = null): int
     {
+        $captureProgress?->__invoke(0);
+
         $source = $this->connections->forRemote(
             $remote['host'],
             $remote['port'],
@@ -107,16 +110,29 @@ class DatabaseImportService
         }
 
         try {
+            $captured = 0;
+            $reported = microtime(true);
+
             foreach ($this->remoteStatements($source) as $statement) {
                 $line = base64_encode($statement)."\n";
                 if (fwrite($stream, $line) !== strlen($line)) {
                     throw new DatabaseImportException(DatabaseImportException::UNKNOWN, 'Could not write the temporary remote dump.');
                 }
+
+                $captured++;
+                if ($captureProgress && microtime(true) - $reported >= 1) {
+                    $captureProgress($captured);
+                    $reported = microtime(true);
+                }
             }
+
+            $captureProgress?->__invoke($captured);
 
             if (! rewind($stream)) {
                 throw new DatabaseImportException(DatabaseImportException::UNKNOWN, 'Could not rewind the temporary remote dump.');
             }
+
+            $progress?->__invoke(0);
 
             return $this->import($database, $this->bufferedStatements($stream), $wipe, $progress);
         } finally {

@@ -353,6 +353,38 @@ class DatabaseTransferTest extends ClientApiIntegrationTestCase
         Storage::disk('local')->assertMissing('database-imports/dump.sql');
     }
 
+    public function test_remote_capture_progress_is_separate_from_applied_statements()
+    {
+        [, $server] = $this->generateTestAccount();
+        $database = $this->createDatabase($server);
+        $status = $this->app->make(DatabaseImportStatusService::class);
+        $token = $status->start($database);
+
+        $this->mock(DatabaseImportService::class)->expects('fromRemote')->andReturnUsing(
+            function ($database, $remote, $wipe, $progress, $captureProgress) use ($status) {
+                $captureProgress(12);
+                $this->assertSame('capturing', $status->get($database)['phase']);
+                $this->assertSame(12, $status->get($database)['captured_statements']);
+                $this->assertSame(0, $status->get($database)['statements']);
+
+                $progress(0);
+                $this->assertSame('importing', $status->get($database)['phase']);
+                $progress(5);
+                $this->assertSame(5, $status->get($database)['statements']);
+                $this->assertSame(12, $status->get($database)['captured_statements']);
+
+                return 12;
+            }
+        );
+        $remote = ['host' => 'db.example.com', 'port' => 3306, 'database' => 'source', 'username' => 'user', 'password' => null];
+        $this->app->call([new ImportDatabaseJob($database->id, null, $remote, $token), 'handle']);
+
+        $this->assertSame(DatabaseImportStatusService::STATE_COMPLETED, $status->get($database)['state']);
+        $this->assertSame(12, $status->get($database)['statements']);
+        $status->captureProgress($database, 99);
+        $this->assertSame(12, $status->get($database)['captured_statements']);
+    }
+
     public function test_job_records_why_an_import_failed()
     {
         [, $server] = $this->generateTestAccount();

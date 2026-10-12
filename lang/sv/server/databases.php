@@ -28,6 +28,7 @@ return [
     'password' => 'Lösenord',
     'jdbc-connection-string' => 'JDBC-anslutningssträng',
     'importing' => 'Importerar, {{statements}} satser har körts hittills',
+    'reading-source' => 'Läser källan, {{statements}} satser har sparats hittills',
     'import-failed' => 'Importen misslyckades',
     'import-completed' => 'Importen till {{name}} är klar, {{statements}} satser kördes.',
     'import-title' => 'Importera databas',

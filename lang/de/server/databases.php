@@ -28,6 +28,7 @@ return [
     'password' => 'Passwort',
     'jdbc-connection-string' => 'JDBC-Verbindungszeichenfolge',
     'importing' => 'Import läuft, bisher {{statements}} Anweisungen ausgeführt',
+    'reading-source' => 'Quelle wird gelesen, bisher {{statements}} Anweisungen erfasst',
     'import-failed' => 'Import fehlgeschlagen',
     'import-completed' => 'Der Import in {{name}} wurde abgeschlossen, {{statements}} Anweisungen wurden ausgeführt.',
     'import-title' => 'Datenbank importieren',

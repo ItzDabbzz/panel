@@ -2,6 +2,8 @@ import http from '@/api/http';
 
 export interface DatabaseImportStatus {
     state: 'running' | 'completed' | 'failed';
+    phase?: 'capturing' | 'importing';
+    capturedStatements?: number;
     statements: number;
     error: string | null;
     detail: string | null;
@@ -21,6 +23,8 @@ export const rawDataToDatabaseImportStatus = (data: any): DatabaseImportStatus |
     data
         ? {
               state: data.state,
+              phase: data.phase ?? 'importing',
+              capturedStatements: data.captured_statements ?? 0,
               statements: data.statements ?? 0,
               error: data.error ?? null,
               detail: data.detail ?? null,

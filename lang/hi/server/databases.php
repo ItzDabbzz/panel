@@ -28,6 +28,7 @@ return [
     'password' => 'पासवर्ड',
     'jdbc-connection-string' => 'जेडीबीसी कनेक्शन स्ट्रिंग',
     'importing' => 'आयात हो रहा है, अब तक {{statements}} स्टेटमेंट चलाए गए',
+    'reading-source' => 'स्रोत पढ़ा जा रहा है, अब तक {{statements}} स्टेटमेंट एकत्र किए गए',
     'import-failed' => 'आयात विफल रहा',
     'import-completed' => '{{name}} में आयात पूरा हो गया, {{statements}} स्टेटमेंट चलाए गए।',
     'import-title' => 'डेटाबेस आयात करें',

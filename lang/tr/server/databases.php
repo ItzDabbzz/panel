@@ -28,6 +28,7 @@ return [
     'password' => 'Şifre',
     'jdbc-connection-string' => 'JDBC Bağlantı Dizesi',
     'importing' => 'İçe aktarılıyor, şu ana kadar {{statements}} ifade çalıştırıldı',
+    'reading-source' => 'Kaynak okunuyor, şu ana kadar {{statements}} ifade kaydedildi',
     'import-failed' => 'İçe aktarma başarısız oldu',
     'import-completed' => '{{name}} veritabanına içe aktarma tamamlandı, {{statements}} ifade çalıştırıldı.',
     'import-title' => 'Veritabanını içe aktar',

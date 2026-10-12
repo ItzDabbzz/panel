@@ -77,7 +77,7 @@ class ImportDatabaseJob extends Job implements ShouldBeEncrypted, ShouldQueue
             $progress = fn (int $statements) => $status->progress($database, $statements);
 
             $statements = $this->remote
-                ? $service->fromRemote($database, $this->remote, $this->wipe, $progress)
+                ? $service->fromRemote($database, $this->remote, $this->wipe, $progress, fn (int $captured) => $status->captureProgress($database, $captured))
                 : $service->fromFile($database, Storage::disk('local')->path($this->file), $this->wipe, $progress);
 
             $status->complete($database, $statements);

@@ -28,6 +28,7 @@ return [
     'password' => 'পাসওয়ার্ড',
     'jdbc-connection-string' => 'JDBC সংযোগ স্ট্রিং',
     'importing' => 'ইমপোর্ট চলছে, এখন পর্যন্ত {{statements}}টি স্টেটমেন্ট চালানো হয়েছে',
+    'reading-source' => 'উৎস পড়া হচ্ছে, এখন পর্যন্ত {{statements}}টি স্টেটমেন্ট সংগ্রহ করা হয়েছে',
     'import-failed' => 'ইমপোর্ট ব্যর্থ হয়েছে',
     'import-completed' => '{{name}}-এ ইমপোর্ট সম্পন্ন হয়েছে, {{statements}}টি স্টেটমেন্ট চালানো হয়েছে।',
     'import-title' => 'ডাটাবেস ইমপোর্ট করুন',

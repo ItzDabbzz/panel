@@ -28,6 +28,7 @@ return [
     'password' => 'كلمة المرور',
     'jdbc-connection-string' => 'سلسلة اتصال JDBC',
     'importing' => 'جارٍ الاستيراد، تم تنفيذ {{statements}} عبارة حتى الآن',
+    'reading-source' => 'جارٍ قراءة المصدر، تم جمع {{statements}} عبارة حتى الآن',
     'import-failed' => 'فشل الاستيراد',
     'import-completed' => 'اكتمل الاستيراد إلى {{name}}، وتم تنفيذ {{statements}} عبارة.',
     'import-title' => 'استيراد قاعدة البيانات',

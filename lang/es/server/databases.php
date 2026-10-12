@@ -28,6 +28,7 @@ return [
     'password' => 'Contraseña',
     'jdbc-connection-string' => 'Cadena de conexión JDBC',
     'importing' => 'Importando, {{statements}} sentencias ejecutadas hasta ahora',
+    'reading-source' => 'Leyendo el origen, {{statements}} sentencias recopiladas hasta ahora',
     'import-failed' => 'La importación falló',
     'import-completed' => 'La importación en {{name}} ha finalizado, se ejecutaron {{statements}} sentencias.',
     'import-title' => 'Importar base de datos',

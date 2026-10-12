@@ -99,6 +99,43 @@ class DatabaseImportServiceTest extends TestCase
         }
     }
 
+    public function test_remote_capture_reports_progress_before_applying_statements()
+    {
+        $source = Mockery::mock(PDO::class);
+        $target = Mockery::mock(PDO::class);
+        $connections = Mockery::mock(DatabaseConnectionFactory::class);
+        $connections->expects('forRemote')->andReturn($source);
+        $connections->expects('forDatabase')->andReturn($target);
+        $dumper = Mockery::mock(DatabaseDumper::class);
+        $dumper->expects('statements')->with($source)->andReturn((function () {
+            yield 'SET NAMES utf8mb4';
+            usleep(1100000);
+            yield 'SELECT 1';
+            yield 'SELECT 2';
+        })());
+        $events = [];
+        $target->shouldReceive('query')->andReturnUsing(function ($statement) use (&$events) {
+            $events[] = ['apply', $statement];
+            $result = Mockery::mock(PDOStatement::class);
+            $result->expects('closeCursor')->andReturn(true);
+
+            return $result;
+        });
+        $service = new DatabaseImportService($connections, $dumper, new SqlStatementReader(), Mockery::mock(DynamicDatabaseConnection::class), Mockery::mock(DatabaseRepository::class));
+        $service->fromRemote(new Database(), [
+            'host' => 'alias.example.com', 'port' => 3306, 'database' => 'source', 'username' => 'user',
+        ], false, function ($count) use (&$events) {
+            $events[] = ['import', $count];
+        }, function ($count) use (&$events) {
+            $events[] = ['capture', $count];
+        });
+
+        $this->assertSame([
+            ['capture', 0], ['capture', 2], ['capture', 3], ['import', 0],
+            ['apply', 'SET NAMES utf8mb4'], ['apply', 'SELECT 1'], ['apply', 'SELECT 2'],
+        ], $events);
+    }
+
     public static function wipeDataProvider(): array
     {
         return [[false], [true]];
