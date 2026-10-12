@@ -3,6 +3,7 @@
 namespace Tests\Integration\Filament;
 
 use App\Filament\Resources\Nests\Eggs\Pages\CreateEgg;
+use App\Filament\Resources\Nests\Eggs\Pages\EditEgg;
 use App\Models\Egg;
 use App\Models\Nest;
 use App\Models\User;
@@ -45,6 +46,25 @@ class CreateEggTest extends IntegrationTestCase
 
             $this->assertSame($nest->id, Egg::query()->where('name', $name)->sole()->nest_id);
         }
+    }
+
+    public function test_editor_rejects_duplicate_environment_names(): void
+    {
+        $this->actingAs(User::factory()->create(['root_admin' => true]));
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $server = $this->createServerModel();
+        $variable = [
+            'name' => 'Test option', 'env_variable' => 'TEST_OPTION',
+            'default_value' => 'value', 'rules' => ['required', 'string'],
+            'user_viewable' => true, 'user_editable' => true,
+        ];
+
+        Livewire::test(EditEgg::class, ['record' => $server->egg_id])
+            ->fillForm(['variables' => ['first' => $variable, 'second' => $variable]])
+            ->call('save')
+            ->assertHasFormErrors(['variables.first.env_variable', 'variables.second.env_variable']);
+
+        $this->assertDatabaseMissing('egg_variables', ['egg_id' => $server->egg_id, 'env_variable' => 'TEST_OPTION']);
     }
 
     public function test_nest_is_required_without_a_create_link_default(): void

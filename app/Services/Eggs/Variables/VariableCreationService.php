@@ -3,6 +3,7 @@
 namespace App\Services\Eggs\Variables;
 
 use App\Contracts\Repository\EggVariableRepositoryInterface;
+use App\Exceptions\DisplayException;
 use App\Exceptions\Model\DataValidationException;
 use App\Exceptions\Service\Egg\Variable\BadValidationRuleException;
 use App\Exceptions\Service\Egg\Variable\ReservedVariableNameException;
@@ -39,6 +40,13 @@ class VariableCreationService
     {
         if (in_array(strtoupper(array_get($data, 'env_variable')), explode(',', EggVariable::RESERVED_ENV_NAMES))) {
             throw new ReservedVariableNameException(sprintf('Cannot use the protected name %s for this environment variable.', array_get($data, 'env_variable')));
+        }
+
+        if ($this->repository->findCountWhere([
+            ['env_variable', '=', $data['env_variable'] ?? ''],
+            ['egg_id', '=', $egg],
+        ]) > 0) {
+            throw new DisplayException(trans('exceptions.service.variables.env_not_unique', ['name' => $data['env_variable'] ?? '']));
         }
 
         if (! empty($data['rules'] ?? '')) {

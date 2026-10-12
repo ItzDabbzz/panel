@@ -28,6 +28,11 @@ class EggParserService
             throw new InvalidFileUploadException('The JSON file provided is not in a format that can be recognized.');
         }
 
+        $duplicates = Collection::make($parsed['variables'] ?? [])->pluck('env_variable')->duplicatesStrict();
+        if ($duplicates->isNotEmpty()) {
+            throw new InvalidFileUploadException(trans('exceptions.service.variables.env_not_unique', ['name' => $duplicates->first()]));
+        }
+
         return $this->convertToV2($parsed);
     }
 

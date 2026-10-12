@@ -6,6 +6,7 @@ use App\Exceptions\Service\InvalidFileUploadException;
 use App\Models\Egg;
 use App\Services\Eggs\EggParserService;
 use Illuminate\Http\UploadedFile;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class EggParserServiceTest extends TestCase
@@ -95,6 +96,40 @@ class EggParserServiceTest extends TestCase
         foreach (['PTDL_v1', 'PTDL_v2', 'RCYL_v26'] as $version) {
             $this->assertContains($version, Egg::VERSIONS);
         }
+    }
+
+    #[DataProvider('supportedVersions')]
+    public function test_it_rejects_duplicate_environment_names(string $version): void
+    {
+        $this->expectException(InvalidFileUploadException::class);
+        $this->expectExceptionMessage(trans('exceptions.service.variables.env_not_unique', ['name' => 'TEST_OPTION']));
+
+        $this->parse([
+            'meta' => ['version' => $version],
+            'variables' => [
+                ['env_variable' => 'TEST_OPTION', 'default_value' => 'first'],
+                ['env_variable' => 'TEST_OPTION', 'default_value' => 'last'],
+            ],
+        ]);
+    }
+
+    #[DataProvider('supportedVersions')]
+    public function test_it_preserves_distinct_case_sensitive_environment_names(string $version): void
+    {
+        $parsed = $this->parse([
+            'meta' => ['version' => $version],
+            'variables' => [
+                ['env_variable' => 'TEST_OPTION'],
+                ['env_variable' => 'test_option'],
+            ],
+        ]);
+
+        $this->assertSame(['TEST_OPTION', 'test_option'], array_column($parsed['variables'], 'env_variable'));
+    }
+
+    public static function supportedVersions(): array
+    {
+        return array_map(fn (string $version) => [$version], Egg::VERSIONS);
     }
 
     /**

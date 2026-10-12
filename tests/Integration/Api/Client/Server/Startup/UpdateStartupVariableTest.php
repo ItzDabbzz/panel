@@ -6,6 +6,7 @@ use App\Models\EggVariable;
 use App\Models\Permission;
 use App\Models\Server;
 use App\Models\User;
+use App\Services\Servers\EnvironmentService;
 use Illuminate\Http\Response;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Integration\Api\Client\ClientApiIntegrationTestCase;
@@ -147,6 +148,63 @@ class UpdateStartupVariableTest extends ClientApiIntegrationTestCase
 
         $user2 = User::factory()->create();
         $this->actingAs($user2)->putJson($this->link($server).'/startup/variable')->assertNotFound();
+    }
+
+    public function test_duplicate_name_updates_the_effective_variable(): void
+    {
+        [$user, $server] = $this->generateTestAccount();
+        $egg = $this->cloneEggAndVariables($server->egg);
+        $first = $egg->variables()->where('env_variable', 'BUNGEE_VERSION')->firstOrFail();
+        $last = $first->replicate();
+        $last->default_value = 'last';
+        $last->save();
+        $server->update(['egg_id' => $egg->id, 'startup' => '{{BUNGEE_VERSION}}']);
+
+        $this->actingAs($user)->getJson($this->link($server).'/startup')
+            ->assertOk()->assertJsonCount(2, 'data')
+            ->assertJsonPath('meta.startup_command', 'last');
+
+        $this->actingAs($user)->putJson($this->link($server).'/startup/variable', [
+            'key' => 'BUNGEE_VERSION', 'value' => 'updated',
+        ])->assertOk()->assertJsonPath('attributes.server_value', 'updated')
+            ->assertJsonPath('meta.startup_command', 'updated');
+
+        $this->assertDatabaseHas('server_variables', [
+            'server_id' => $server->id, 'variable_id' => $last->id, 'variable_value' => 'updated',
+        ]);
+        $this->assertDatabaseMissing('server_variables', [
+            'server_id' => $server->id, 'variable_id' => $first->id,
+        ]);
+        $this->assertSame('updated', app(EnvironmentService::class)->handle($server->fresh())['BUNGEE_VERSION']);
+    }
+
+    #[DataProvider('effectiveVariableRestrictions')]
+    public function test_duplicate_name_respects_effective_variable_restrictions(array $restrictions, int $status): void
+    {
+        [$user, $server] = $this->generateTestAccount();
+        $egg = $this->cloneEggAndVariables($server->egg);
+        $last = $egg->variables()->where('env_variable', 'BUNGEE_VERSION')->firstOrFail()->replicate();
+        $last->fill($restrictions)->save();
+        $server->update(['egg_id' => $egg->id, 'startup' => '{{BUNGEE_VERSION}}']);
+
+        $response = $this->actingAs($user)->getJson($this->link($server).'/startup')->assertOk();
+        if (! $last->user_viewable) {
+            $response->assertJsonCount(1, 'data')->assertJsonPath('meta.startup_command', '[hidden]');
+        }
+
+        $this->actingAs($user)->putJson($this->link($server).'/startup/variable', [
+            'key' => 'BUNGEE_VERSION', 'value' => 'updated',
+        ])->assertStatus($status);
+        $this->assertDatabaseMissing('server_variables', ['server_id' => $server->id]);
+    }
+
+    public static function effectiveVariableRestrictions(): array
+    {
+        return [
+            [['user_viewable' => false], 400],
+            [['user_editable' => false], 400],
+            [['rules' => 'required|integer'], 422],
+        ];
     }
 
     public static function permissionsDataProvider(): array

@@ -154,6 +154,7 @@ class EggResource extends Resource
                                         Forms\Components\TextInput::make('env_variable')
                                             ->label(trans('admin/eggs.fields.env_variable'))
                                             ->required()
+                                            ->distinct()
                                             ->maxLength(191),
                                         Forms\Components\TextInput::make('default_value')
                                             ->label(trans('admin/eggs.fields.default_value'))
