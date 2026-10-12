@@ -77,7 +77,7 @@ class RextstoreProvider
                         'https://raw.githubusercontent.com/reviactyl/eggs/'.$tree['sha'].'/'.CatalogUrl::encodePath($path),
                         $tree['sha'], is_string($data['author'] ?? null) ? $data['author'] : null);
                 } catch (CatalogException $exception) {
-                    if ($exception->reason === 'rate_limited') {
+                    if (! in_array($exception->reason, ['invalid_catalog', 'oversized', 'unknown'], true)) {
                         throw $exception;
                     }
                     $invalid++;

@@ -72,6 +72,38 @@ class EggCatalogServiceTest extends TestCase
         app(RextstoreProvider::class)->fetch();
     }
 
+    public function test_rextstore_definition_failure_preserves_the_complete_saved_catalog(): void
+    {
+        $firstSha = str_repeat('a', 40);
+        $nextSha = str_repeat('b', 40);
+        $tree = ['truncated' => false, 'tree' => [
+            ['type' => 'blob', 'path' => 'Minecraft/egg-paper.json'],
+            ['type' => 'blob', 'path' => 'Minecraft/egg-other.json'],
+        ]];
+        $bytes = file_get_contents(base_path('tests/Fixtures/egg-catalog/egg.json'));
+        Http::fake([
+            RextstoreProvider::TREE_URL => Http::sequence()
+                ->push(['sha' => $firstSha] + $tree)->push(['sha' => $nextSha] + $tree),
+            'https://raw.githubusercontent.com/reviactyl/eggs/'.$firstSha.'/*' => Http::response($bytes),
+            'https://raw.githubusercontent.com/reviactyl/eggs/'.$nextSha.'/Minecraft/egg-paper.json' => Http::response($bytes),
+            'https://raw.githubusercontent.com/reviactyl/eggs/'.$nextSha.'/Minecraft/egg-other.json' => Http::response('', 503),
+        ]);
+        $catalog = app(EggCatalogService::class);
+        $first = $catalog->provider('Rextstore');
+        $this->assertCount(2, $first['entries']);
+        $this->assertNull($first['error']);
+        $this->travel(61)->seconds();
+
+        $failed = $catalog->provider('Rextstore', true);
+
+        $this->assertSame('unavailable', $failed['error']);
+        $this->assertTrue($failed['stale']);
+        $this->assertSame($first['refreshed_at'], $failed['refreshed_at']);
+        $this->assertSame($first['entries'], $failed['entries']);
+        $this->assertSame(0, $failed['invalid']);
+        $this->assertSame($firstSha, $catalog->resolve('Rextstore', 'Minecraft/egg-other.json')->revision);
+    }
+
     public static function rejectedUrls(): array
     {
         $base = 'https://raw.githubusercontent.com/pterodactyl/game-eggs/main/test/egg-paper.json';
