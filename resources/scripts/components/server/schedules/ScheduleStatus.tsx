@@ -38,7 +38,7 @@ export default function ScheduleStatus({
                     ) : phase === 'spinning' ? (
                         <span className='flex items-center rounded-full bg-gray-700 px-2 py-px text-xs uppercase text-white'>
                             <span className='mr-2 flex h-3.5 w-3.5 shrink-0 items-center justify-center' aria-hidden>
-                                <Spinner size='small' className='!h-3.5 !w-3.5 motion-reduce:animate-none' />
+                                <Spinner size='small' className='h-3.5! w-3.5! motion-reduce:animate-none' />
                             </span>
                             Processing
                         </span>

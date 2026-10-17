@@ -21,14 +21,14 @@ export default forwardRef<HTMLFormElement, Props>(({ title, ...props }, ref) => 
         <div className='mx-auto my-auto'>
             <ExtensionSlot name={'auth:form:above'} />
             <Form {...props} ref={ref}>
-                <div className='w-screen max-w-[28.125rem] p-5'>
+                <div className='w-screen max-w-112.5 p-5'>
                     <FlashMessageRender className='mb-2' />
                     <ExtensionSlot name={'auth:card:before'} />
                     <div className='mb-3 flex justify-end'>
                         <NavbarLanguageSwitcher />
                     </div>
                     <LogoContainer>
-                        <img src={logo} alt={name} className='h-[3rem]' />
+                        <img src={logo} alt={name} className='h-12' />
                     </LogoContainer>
                     <Card>
                         {title && <Title className='text-3xl text-center pb-3'>{title}</Title>}

@@ -10,9 +10,9 @@ const MaintenanceAlert = () => {
         <>
             {isUnderMaintenance ? (
                 <div className='px-2'>
-                    <div className='mx-auto mt-2 flex w-full max-w-[1200px] items-center gap-x-3 rounded-ui border border-yellow-500/60 bg-yellow-800/10 p-3 text-gray-100'>
+                    <div className='mx-auto mt-2 flex w-full max-w-300 items-center gap-x-3 rounded-ui border border-yellow-500/60 bg-yellow-800/10 p-3 text-gray-100'>
                         <div>
-                            <FaTriangleExclamation className='h-5 w-5 font-bold !text-yellow-500' />
+                            <FaTriangleExclamation className='h-5 w-5 font-bold text-yellow-500!' />
                         </div>
                         <div>
                             <b>{t('under_maintenance')}</b> {t('maintenance-mode-warning')}

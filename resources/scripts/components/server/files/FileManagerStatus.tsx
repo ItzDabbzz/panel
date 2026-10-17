@@ -27,7 +27,7 @@ const Spinner = ({ progress, className }: { progress: number; className?: string
             {...svgProps}
             stroke={'white'}
             strokeDasharray={28 * Math.PI}
-            className={'rotate-[-90deg] origin-[50%_50%] transition-[stroke-dashoffset] duration-300'}
+            className={'-rotate-90 origin-[50%_50%] transition-[stroke-dashoffset] duration-300'}
             style={{ strokeDashoffset: ((100 - progress) / 100) * 28 * Math.PI }}
         />
     </svg>
@@ -85,7 +85,7 @@ const FileUploadList = () => {
             {uploads.map((upload) => (
                 <div key={upload.id} className={'flex items-center space-x-3 bg-gray-900 p-3 rounded'}>
                     <Tooltip content={`${Math.floor(uploadProgress(upload))}%`} placement={'left'}>
-                        <div className={'flex-shrink-0'}>
+                        <div className={'shrink-0'}>
                             <Spinner progress={uploadProgress(upload)} className={'w-6 h-6'} />
                         </div>
                     </Tooltip>

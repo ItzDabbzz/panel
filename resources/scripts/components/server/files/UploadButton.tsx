@@ -390,7 +390,7 @@ export default ({ className }: WithClassname & { compact?: boolean }) => {
                                     'flex items-center space-x-4 w-full ring-4 ring-gray-700 ring-opacity-60 p-6 mx-10 max-w-sm'
                                 }
                             >
-                                <FaUpload className={'w-10 h-10 flex-shrink-0'} />
+                                <FaUpload className={'w-10 h-10 shrink-0'} />
                                 <p className={'font-header flex-1 text-lg text-gray-100 text-center'}>
                                     {t('drop-files-folders')}
                                 </p>

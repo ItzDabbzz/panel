@@ -87,11 +87,11 @@ const TopServerDetails = () => {
     });
 
     return (
-        <div className='relative z-10 pt-4 pl-2 w-full max-w-[75rem] mx-auto'>
-            <Card className='!p-4 !px-8 mx-auto'>
-                <div className='mx-auto w-full md:flex items-center justify-between max-w-[75rem]'>
+        <div className='relative z-10 pt-4 pl-2 w-full max-w-300 mx-auto'>
+            <Card className='p-4! px-8! mx-auto'>
+                <div className='mx-auto w-full md:flex items-center justify-between max-w-300'>
                     <div className='flex items-center gap-x-3'>
-                        <Title className='text-3xl truncate flex-1 max-w-[400px]' title={name}>
+                        <Title className='text-3xl truncate flex-1 max-w-100' title={name}>
                             {name}
                         </Title>
                         {rootAdmin && (

@@ -82,7 +82,7 @@ const ScheduleEditContainer = () => {
                     <div className='mb-4 rounded-ui bg-gray-900 p-3 sm:hidden'>
                         <ScheduleCronRow cron={schedule.cron} />
                     </div>
-                    <Card className='!p-1'>
+                    <Card className='p-1!'>
                         <div className='items-center rounded-t border-b-4 border-gray-800 p-3 sm:flex sm:p-6'>
                             <div className='flex-1'>
                                 <h3 className='flex items-center text-2xl text-gray-100'>

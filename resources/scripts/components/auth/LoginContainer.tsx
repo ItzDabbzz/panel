@@ -196,7 +196,7 @@ function LoginContainer() {
                             />
                             <button
                                 type={'button'}
-                                className='absolute top-[10px] right-[6px] p-1 py-2 text-gray-500'
+                                className='absolute top-2.5 right-1.5 p-1 py-2 text-gray-500'
                                 onClick={() => setShow(!show)}
                             >
                                 {show ? <EyeIcon className='h-5 w-5' /> : <EyeOffIcon className='h-5 w-5' />}

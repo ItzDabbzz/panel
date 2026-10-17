@@ -60,7 +60,7 @@ const ImageViewerModal = ({ imageUrl, imageName, ...modalProps }: Props) => {
                 <div className='mb-4'>
                     <h2 className='text-xl font-semibold text-gray-100'>{imageName}</h2>
                 </div>
-                <div className='flex max-h-[80vh] min-h-[500px] items-center justify-center overflow-hidden rounded-ui bg-gray-900'>
+                <div className='flex max-h-[80vh] min-h-125 items-center justify-center overflow-hidden rounded-ui bg-gray-900'>
                     <img
                         ref={imageRef}
                         src={imageUrl}

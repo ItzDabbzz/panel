@@ -298,7 +298,7 @@ const FileDropdownMenu = ({ file }: { file: FileObject }) => {
                                 role='menu'
                                 ref={formatMenuRef}
                                 style={showFormatMenu ? formatMenuPosition : undefined}
-                                className='absolute left-[calc(100%-0.5rem)] top-[-0.5rem] z-30 hidden w-48 rounded-ui border border-gray-800 bg-gray-800 p-2 text-gray-100 shadow-lg group-hover:block group-focus-within:block'
+                                className='absolute left-[calc(100%-0.5rem)] -top-2 z-30 hidden w-48 rounded-ui border border-gray-800 bg-gray-800 p-2 text-gray-100 shadow-lg group-hover:block group-focus-within:block'
                             >
                                 {(['tar.gz', 'zip'] as const).map((format) => (
                                     <button

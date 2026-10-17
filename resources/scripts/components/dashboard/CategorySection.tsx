@@ -31,7 +31,7 @@ export default ({ category, servers, showOnlyAdmin, showCategory = true, onCateg
 
             {/* HEADER */}
             <button
-                className='flex w-full cursor-pointer items-center justify-between px-5 py-[18px] text-left transition-all duration-150 hover:bg-gray-700'
+                className='flex w-full cursor-pointer items-center justify-between px-5 py-4.5 text-left transition-all duration-150 hover:bg-gray-700'
                 onClick={() => setOpen(!open)}
             >
                 <div className='flex min-w-0 flex-1 items-center gap-3'>

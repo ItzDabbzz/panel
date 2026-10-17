@@ -130,7 +130,7 @@ const FileEditContainer = () => {
                 </Card>
             </ErrorBoundary>
             {hash.replace(/^#/, '').endsWith('.pteroignore') && (
-                <Card className='!rounded-none mb-1'>
+                <Card className='rounded-none! mb-1'>
                     <div className='mb-4 rounded-ui border border-gray-800 p-4'>
                         <p className='text-sm text-gray-300'>
                             You&apos;re editing a{' '}

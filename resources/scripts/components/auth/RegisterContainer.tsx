@@ -171,7 +171,7 @@ const RegisterContainer = () => {
                         />
                         <button
                             type={'button'}
-                            className='absolute top-[36px] right-[6px] p-1 py-2 text-gray-500'
+                            className='absolute top-9 right-1.5 p-1 py-2 text-gray-500'
                             onClick={() => setShow(!show)}
                         >
                             {show ? <EyeOffIcon className='h-5 w-5' /> : <EyeIcon className='h-5 w-5' />}
@@ -188,7 +188,7 @@ const RegisterContainer = () => {
                         />
                     </div>
                     <div className='mt-6'>
-                        <Button className='w-full !py-3' type={'submit'} disabled={isSubmitting}>
+                        <Button className='w-full py-3!' type={'submit'} disabled={isSubmitting}>
                             {t('register.label')}
                         </Button>
                     </div>

@@ -24,7 +24,7 @@ interface NavbarProps {
 
 const NavbarContainer = ({ children, className = '' }: React.HTMLAttributes<HTMLDivElement>) => (
     <div
-        className={`fixed top-[var(--subuser-preview-offset,0px)] left-0 z-50 h-16 w-full transition duration-300 ${className}`}
+        className={`fixed top-(--subuser-preview-offset,0px) left-0 z-50 h-16 w-full transition duration-300 ${className}`}
     >
         {children}
     </div>
@@ -60,7 +60,7 @@ export const SidebarClassic = React.forwardRef<HTMLDivElement, SidebarProps>(({ 
     return (
         <div
             ref={ref}
-            className={`m-2 w-[225px] self-start flex-col rounded-ui border border-gray-800 bg-gray-900 text-white 2xl:w-64 lg:fixed lg:top-[calc(64px+var(--subuser-preview-offset,0px))] lg:left-0 lg:z-40 lg:flex lg:h-[calc(100dvh-100px-var(--subuser-preview-offset,0px))] lg:overflow-y-auto ${
+            className={`m-2 w-56.25 self-start flex-col rounded-ui border border-gray-800 bg-gray-900 text-white 2xl:w-64 lg:fixed lg:top-[calc(64px+var(--subuser-preview-offset,0px))] lg:left-0 lg:z-40 lg:flex lg:h-[calc(100dvh-100px-var(--subuser-preview-offset,0px))] lg:overflow-y-auto ${
                 isOpen
                     ? 'fixed top-[calc(4rem+var(--subuser-preview-offset,0px))] left-0 z-40 flex h-[calc(100dvh-64px-var(--subuser-preview-offset,0px))] overflow-y-auto'
                     : 'hidden'

@@ -178,7 +178,7 @@ export default () => {
 
             <div className='relative z-20 flex flex-col gap-4 py-4 md:flex-row md:items-center justify-between'>
                 <div className='min-w-0'>
-                    <Title className='text-4xl !font-bold'>
+                    <Title className='text-4xl font-bold!'>
                         {showAdminServers ? t('servers-admin.title') : t('servers-user.title')}
                     </Title>
 
@@ -196,7 +196,7 @@ export default () => {
                                 </div>
                             )}
                             {rootAdmin && (
-                                <div className='flex flex-shrink-0 items-center justify-between gap-2'>
+                                <div className='flex shrink-0 items-center justify-between gap-2'>
                                     <p className='uppercase text-xs text-gray-300 whitespace-nowrap'>
                                         {showOnlyAdmin ? t('other-servers') : t('your-servers')}
                                     </p>
@@ -212,12 +212,12 @@ export default () => {
                                 </div>
                             )}
 
-                            <div className='relative flex flex-shrink-0 items-center sm:border-l sm:border-[#334155] sm:pl-4 gap-x-1'>
+                            <div className='relative flex shrink-0 items-center sm:border-l sm:border-[#334155] sm:pl-4 gap-x-1'>
                                 <div>
                                     <Button.Text
                                         type='button'
                                         onClick={() => setModalVisible(true)}
-                                        className='!p-2'
+                                        className='p-2!'
                                         title={t('categories.manage')}
                                         aria-label={t('categories.manage')}
                                     >
@@ -231,7 +231,7 @@ export default () => {
                                             type='button'
                                             onClick={() => setEggFilterOpen((o) => !o)}
                                             className={clsx(
-                                                '!p-2',
+                                                'p-2!',
                                                 (selectedEggId !== null || selectedCategory !== 'all') &&
                                                     'bg-blue-700 hover:bg-blue-600',
                                             )}
@@ -246,7 +246,7 @@ export default () => {
                                     {eggFilterOpen && (
                                         <Card
                                             ref={eggFilterRef}
-                                            className='absolute right-0 sm:left-auto top-full mt-1.5 z-10 min-w-[180px] !py-2 !px-2 shadow-lg'
+                                            className='absolute right-0 sm:left-auto top-full mt-1.5 z-10 min-w-45 py-2! px-2! shadow-lg'
                                         >
                                             {/* Egg filter is global (not user-specific): show for both "your servers" and "others' servers" */}
                                             {(eggs && eggs.length > 0) ||

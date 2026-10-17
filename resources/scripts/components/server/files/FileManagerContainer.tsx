@@ -213,7 +213,7 @@ export default () => {
         <ServerContentBlock title={t('title')} showFlashKey={'files'}>
             <ExtensionSlot name={`server:files:above`} />
             <ErrorBoundary>
-                <Card className={'flex flex-col mb-1 mt-2 !rounded-b-none !px-2 !py-3'}>
+                <Card className={'flex flex-col mb-1 mt-2 rounded-b-none! px-2! py-3!'}>
                     <div className='flex flex-wrap md:flex-nowrap items-center gap-2'>
                         <Can action={'file.create'}>
                             <div className={style.manager_actions}>
@@ -236,7 +236,7 @@ export default () => {
                             </div>
                         </Can>
                         {selectedFilesLength > 0 && <MassActionsBar />}
-                        <div className='order-2 md:order-none md:ml-auto flex items-center gap-1 w-full md:w-auto'>
+                        <div className='order-2 md:order-0 md:ml-auto flex items-center gap-1 w-full md:w-auto'>
                             <Input
                                 ref={searchInputRef}
                                 type='text'
@@ -260,7 +260,7 @@ export default () => {
                         </div>
                     </div>
                     <div className='flex flex-wrap md:flex-nowrap items-center gap-2 mt-2'>
-                        <div className='order-3 w-full min-w-0 md:order-none md:flex-1 md:w-auto bg-gray-800 rounded-ui py-2'>
+                        <div className='order-3 w-full min-w-0 md:order-0 md:flex-1 md:w-auto bg-gray-800 rounded-ui py-2'>
                             <FileManagerBreadcrumbs
                                 renderLeft={
                                     <FileActionCheckbox
@@ -274,9 +274,9 @@ export default () => {
                         </div>
                     </div>
                 </Card>
-                <Card className={'items-center mb-1 !rounded-none !px-2 !py-2 !bg-gray-800 hidden md:block'}>
-                    <div className='order-4 md:order-none flex items-center gap-1'>
-                        <div className='flex-1 ml-[55px]'>
+                <Card className={'items-center mb-1 rounded-none! px-2! py-2! bg-gray-800! hidden md:block'}>
+                    <div className='order-4 md:order-0 flex items-center gap-1'>
+                        <div className='flex-1 ml-13.75'>
                             <button
                                 onClick={() => {
                                     if (sortType === 'name') {
@@ -316,7 +316,7 @@ export default () => {
                                 )}
                             </button>
                         </div>
-                        <div className='w-1/5 mr-[80px] justify-end flex'>
+                        <div className='w-1/5 mr-20 justify-end flex'>
                             <button
                                 onClick={() => {
                                     if (sortType === 'date') {
@@ -342,7 +342,7 @@ export default () => {
             {!files ? (
                 <Spinner size={'large'} centered />
             ) : (
-                <Card className='!rounded-t-none !p-3'>
+                <Card className='rounded-t-none! p-3!'>
                     {query ? (
                         isSearching && recursiveResults.length === 0 ? (
                             <Spinner size={'base'} centered />

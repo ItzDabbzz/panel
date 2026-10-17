@@ -68,13 +68,13 @@ const NavbarLanguageSwitcher = () => {
             >
                 {currentLanguage?.flag && (
                     <span
-                        className={`fi fi-${currentLanguage.flag} inline-block h-[15px] w-5 rounded-[2px] shadow-[0_0_2px_rgba(0,0,0,0.3)]`}
+                        className={`fi fi-${currentLanguage.flag} inline-block h-3.75 w-5 rounded-xs shadow-[0_0_2px_rgba(0,0,0,0.3)]`}
                     />
                 )}
             </button>
 
             <div
-                className={`absolute right-0 top-full z-50 mt-1 min-w-[200px] overflow-hidden rounded-ui border border-gray-800 bg-gray-900/90 shadow-lg backdrop-blur-md rtl:left-0 rtl:right-auto ${
+                className={`absolute right-0 top-full z-50 mt-1 min-w-50 overflow-hidden rounded-ui border border-gray-800 bg-gray-900/90 shadow-lg backdrop-blur-md rtl:left-0 rtl:right-auto ${
                     isOpen ? 'block' : 'hidden'
                 }`}
             >
@@ -91,7 +91,7 @@ const NavbarLanguageSwitcher = () => {
                     >
                         {info.flag && (
                             <span
-                                className={`fi fi-${info.flag} inline-block h-[15px] w-5 rounded-[2px] shadow-[0_0_2px_rgba(0,0,0,0.3)]`}
+                                className={`fi fi-${info.flag} inline-block h-3.75 w-5 rounded-xs shadow-[0_0_2px_rgba(0,0,0,0.3)]`}
                             />
                         )}
                         {info.name}

@@ -88,10 +88,10 @@ export default ({
                 />
             )}
             <Link to={`/server/${server.id}/`} className={className}>
-                <Card className='!p-6 relative overflow-hidden'>
+                <Card className='p-6! relative overflow-hidden'>
                     <img
                         src={server.eggImage || '/reviactyl/icon.png'}
-                        className={`absolute right-4 top-1/2 -translate-y-1/2 h-[120px] w-[120px] opacity-20 pointer-events-none select-none`}
+                        className={`absolute right-4 top-1/2 -translate-y-1/2 h-30 w-30 opacity-20 pointer-events-none select-none`}
                     />
                     <div className='flex items-center justify-between pb-5 gap-x-2'>
                         <div className='flex-1 min-w-0'>
@@ -155,7 +155,7 @@ export default ({
                     <div
                         className={`${
                             isSpecialState
-                                ? 'flex justify-center items-center min-h-[100px]'
+                                ? 'flex justify-center items-center min-h-25'
                                 : 'grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4'
                         } mt-4`}
                     >

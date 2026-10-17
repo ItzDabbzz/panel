@@ -45,7 +45,7 @@ const FileEditorSwitcher = () => {
     return (
         <div className='flex flex-col gap-2 mb-2 sm:flex-row sm:justify-between sm:items-center'>
             <p className='min-w-0 flex-1'>{t('overview.editor')}</p>
-            <Select className='!pr-15 w-full min-w-0 sm:!w-auto' value={currentEditor} onChange={handleChange}>
+            <Select className='pr-15! w-full min-w-0 sm:w-auto!' value={currentEditor} onChange={handleChange}>
                 {Object.entries(editors).map(([key, name]) => (
                     <option key={key} value={key}>
                         {name.display}

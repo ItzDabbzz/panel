@@ -38,7 +38,7 @@ const ServerConsoleContainer = () => {
                         <ConsoleBlock />
                     </Spinner.Suspense>
                 </div>
-                <ServerDetailsBlock className={'col-span-4 lg:col-span-1 order-last lg:order-none'} />
+                <ServerDetailsBlock className={'col-span-4 lg:col-span-1 order-last lg:order-0'} />
             </div>
             <div className={'grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-4 mt-2'}>
                 <Spinner.Suspense>

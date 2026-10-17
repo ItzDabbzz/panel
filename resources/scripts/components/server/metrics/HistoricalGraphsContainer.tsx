@@ -164,7 +164,7 @@ export default () => {
         <ServerContentBlock title={t('title')}>
             <FlashMessageRender byKey={'server:metrics'} />
             <div className='mb-4 flex justify-end space-x-2'>
-                <Select value={days} onChange={(e) => setDays(e.target.value as TimeRange)} className={'!w-auto'}>
+                <Select value={days} onChange={(e) => setDays(e.target.value as TimeRange)} className={'w-auto!'}>
                     <option value={1}>{t('time_range.last_24_hours')}</option>
                     <option value={3}>{t('time_range.last_3_days')}</option>
                     <option value={7}>{t('time_range.last_7_days')}</option>
