@@ -43,7 +43,7 @@ export default () => {
                             >
                                 <FaKey className={'text-gray-300'} />
                                 <div className='flex-1'>
-                                    <p className='text-sm break-words font-medium'>{key.name}</p>
+                                    <p className='text-sm wrap-break-word font-medium'>{key.name}</p>
                                     <p className='text-xs mt-1 font-mono truncate'>
                                         {t('ssh.fingerprint')}:{key.fingerprint}
                                     </p>

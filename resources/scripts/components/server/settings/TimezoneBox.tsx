@@ -138,7 +138,7 @@ export default () => {
                 </div>
                 <ComboboxOptions
                     anchor={{ to: 'bottom start', gap: 4 }}
-                    className='z-50 !max-h-64 w-(--input-width) rounded-ui border border-gray-700 bg-gray-900 p-1 shadow-lg empty:invisible'
+                    className='z-50 max-h-64! w-(--input-width) rounded-ui border border-gray-700 bg-gray-900 p-1 shadow-lg empty:invisible'
                 >
                     {({ option }: { option: Option }) => (
                         <ComboboxOption

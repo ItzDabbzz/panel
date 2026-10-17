@@ -78,7 +78,7 @@ export default ({ backup, className }: Props) => {
                                 {t('failed')}
                             </span>
                         )}
-                        <p className='truncate break-words'>{backup.name}</p>
+                        <p className='truncate wrap-break-word'>{backup.name}</p>
                         <span className='ml-2 rounded border border-gray-700 px-1 text-xs text-gray-300'>
                             {backup.format}
                         </span>

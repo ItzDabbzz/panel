@@ -8,7 +8,7 @@ interface ChartBlockProps {
 }
 
 export default ({ title, legend, children }: ChartBlockProps) => (
-    <Card className={'group !p-2'}>
+    <Card className={'group p-2!'}>
         <div className={'flex items-center justify-between px-4 py-2'}>
             <h3 className={'font-header transition-colors duration-100 group-hover:text-gray-50'}>{title}</h3>
             {legend && <p className={'text-sm flex items-center'}>{legend}</p>}

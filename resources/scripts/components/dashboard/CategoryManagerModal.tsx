@@ -222,7 +222,7 @@ export default ({ visible, onDismissed, onCategoryChanged }: Props) => {
 
                     <div className='pr-2'>
                         {categories.length === 0 ? (
-                            <Card className='!border-2 !border-dashed !p-12 flex items-center justify-center gap-3'>
+                            <Card className='border-2! border-dashed! p-12! flex items-center justify-center gap-3'>
                                 <FaLayerGroup className='text-3xl text-gray-400' />
                                 <p className='text-sm text-gray-400'>{t('categories.no-custom-categories')}</p>
                             </Card>

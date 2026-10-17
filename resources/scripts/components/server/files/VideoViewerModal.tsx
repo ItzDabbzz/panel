@@ -15,7 +15,7 @@ const VideoViewerModal = ({ videoUrl, videoName, ...modalProps }: Props) => {
                     <h2 className='text-xl font-semibold text-gray-100'>{videoName}</h2>
                 </div>
 
-                <div className='flex max-h-[80vh] min-h-[360px] items-center justify-center overflow-hidden rounded-ui bg-gray-900 [&_.plyr]:w-1/2'>
+                <div className='flex max-h-[80vh] min-h-90 items-center justify-center overflow-hidden rounded-ui bg-gray-900 [&_.plyr]:w-1/2'>
                     <Plyr
                         source={{
                             type: 'video',

@@ -16,7 +16,7 @@ const Logo: React.FC<Props> = ({ nostyles }) => {
             src={logo}
             alt={name}
             onClick={() => (window.location.href = '/')}
-            className={`h-[3rem] ${nostyles ? '' : 'mt-5'} cursor-pointer`}
+            className={`h-12 ${nostyles ? '' : 'mt-5'} cursor-pointer`}
         />
     );
 

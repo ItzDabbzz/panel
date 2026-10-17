@@ -31,10 +31,10 @@ export const SubuserPreviewFrame = ({ children }: PropsWithChildren) => {
 
     return (
         <div className='min-h-screen bg-gray-950'>
-            <div aria-hidden='true' className='pointer-events-none fixed inset-0 z-[70] border-2 border-amber-500/80' />
+            <div aria-hidden='true' className='pointer-events-none fixed inset-0 z-70 border-2 border-amber-500/80' />
             <aside
                 aria-label={t('preview.session-label')}
-                className='fixed inset-x-0 top-0 z-[60] flex h-16 items-center border-b border-amber-500 bg-gray-950 px-3 text-gray-100 shadow-lg sm:px-5'
+                className='fixed inset-x-0 top-0 z-60 flex h-16 items-center border-b border-amber-500 bg-gray-950 px-3 text-gray-100 shadow-lg sm:px-5'
             >
                 <div className='flex min-w-0 flex-1 items-center gap-3'>
                     <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-ui bg-amber-500/15 text-amber-400'>
@@ -60,7 +60,7 @@ export const SubuserPreviewFrame = ({ children }: PropsWithChildren) => {
                     size={Button.Sizes.Small}
                     disabled={exiting}
                     onClick={onExit}
-                    className='shrink-0 border border-amber-500/40 !text-amber-200 hover:!bg-amber-500/10'
+                    className='shrink-0 border border-amber-500/40 text-amber-200! hover:bg-amber-500/10!'
                 >
                     {exiting ? t('preview.exiting') : t('preview.exit')}
                 </Button.Text>

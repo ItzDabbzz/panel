@@ -170,18 +170,18 @@ const Announcement = ({ placement = 'dashboard', server }: Props) => {
                             >
                                 <span
                                     aria-hidden
-                                    className='pointer-events-none absolute inset-0 bg-[var(--alert-accent)] opacity-10'
+                                    className='pointer-events-none absolute inset-0 bg-(--alert-accent) opacity-10'
                                 />
                                 <span
                                     aria-hidden
-                                    className='absolute inset-y-0 left-0 w-1.5 bg-[var(--alert-accent)]'
+                                    className='absolute inset-y-0 left-0 w-1.5 bg-(--alert-accent)'
                                 />
                                 <Icon
                                     aria-hidden
-                                    className='relative mt-0.5 h-5 w-5 shrink-0 text-[var(--alert-accent)] sm:mt-0'
+                                    className='relative mt-0.5 h-5 w-5 shrink-0 text-(--alert-accent) sm:mt-0'
                                 />
                                 <div className='relative flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-center'>
-                                    <div className='min-w-0 flex-1 break-words'>
+                                    <div className='min-w-0 flex-1 wrap-break-word'>
                                         {alert.title && <strong className='mr-1.5 text-gray-50'>{alert.title}</strong>}
                                         <Md2React markdown={alert.message} />
                                     </div>
@@ -196,8 +196,8 @@ const Announcement = ({ placement = 'dashboard', server }: Props) => {
                                                     onClick={() => onButtonClick(alert)}
                                                     className={
                                                         button.style === 'secondary'
-                                                            ? 'rounded-full px-3 py-1.5 text-sm font-medium text-gray-200 underline-offset-4 transition-colors hover:text-gray-50 hover:underline focus-visible:outline-2 focus-visible:outline-[var(--alert-accent)]'
-                                                            : 'rounded-full border border-gray-100/40 px-4 py-1.5 text-sm font-medium text-gray-50 transition-colors hover:border-gray-100/70 hover:bg-gray-100/10 focus-visible:outline-2 focus-visible:outline-[var(--alert-accent)]'
+                                                            ? 'rounded-full px-3 py-1.5 text-sm font-medium text-gray-200 underline-offset-4 transition-colors hover:text-gray-50 hover:underline focus-visible:outline-2 focus-visible:outline-(--alert-accent)'
+                                                            : 'rounded-full border border-gray-100/40 px-4 py-1.5 text-sm font-medium text-gray-50 transition-colors hover:border-gray-100/70 hover:bg-gray-100/10 focus-visible:outline-2 focus-visible:outline-(--alert-accent)'
                                                     }
                                                 >
                                                     {button.label}
@@ -217,7 +217,7 @@ const Announcement = ({ placement = 'dashboard', server }: Props) => {
                                             aria-label={t('dismiss')}
                                             title={t('dismiss')}
                                             onClick={() => onDismiss(alert)}
-                                            className='relative shrink-0 rounded-full p-1.5 text-gray-200 transition-colors hover:bg-gray-100/10 hover:text-gray-50 focus-visible:outline-2 focus-visible:outline-[var(--alert-accent)]'
+                                            className='relative shrink-0 rounded-full p-1.5 text-gray-200 transition-colors hover:bg-gray-100/10 hover:text-gray-50 focus-visible:outline-2 focus-visible:outline-(--alert-accent)'
                                         >
                                             <FaRegCircleXmark aria-hidden className='h-5 w-5' />
                                         </button>

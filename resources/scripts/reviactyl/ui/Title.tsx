@@ -16,7 +16,7 @@ export const Title = ({ className, children, scheme = 'gray', ...props }: TitleP
     return (
         <div
             className={classNames(
-                'leading-tight bg-gradient-to-tl bg-clip-text font-semibold text-transparent',
+                'leading-tight bg-linear-to-tl bg-clip-text font-semibold text-transparent',
                 colorClass,
                 className,
             )}

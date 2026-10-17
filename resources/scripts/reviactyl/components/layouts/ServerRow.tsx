@@ -95,7 +95,7 @@ export default ({
                 <div className='col-span-12 flex items-center sm:col-span-5 lg:col-span-6'>
                     <img src={server.eggImage ? server.eggImage : '/reviactyl/icon.png'} className='h-10 w-10 mr-4' />
                     <div>
-                        <Title className='text-lg break-words'>{server.name}</Title>
+                        <Title className='text-lg wrap-break-word'>{server.name}</Title>
                         <div className='flex flex-wrap items-center gap-2'>
                             {showCategory && (
                                 <div
@@ -104,7 +104,7 @@ export default ({
                                         e.stopPropagation();
                                         setCategoryModalVisible(true);
                                     }}
-                                    className='inline-block text-[8px] px-2 py-[2px] rounded-full border transition hover:brightness-110 cursor-pointer'
+                                    className='inline-block text-[8px] px-2 py-0.5 rounded-full border transition hover:brightness-110 cursor-pointer'
                                     style={
                                         server.category
                                             ? {
@@ -124,7 +124,7 @@ export default ({
                             )}
 
                             {!!server.description && (
-                                <p className='m-0 truncate break-words text-sm text-gray-300'>{server.description}</p>
+                                <p className='m-0 truncate wrap-break-word text-sm text-gray-300'>{server.description}</p>
                             )}
                         </div>
                     </div>

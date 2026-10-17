@@ -25,9 +25,9 @@ export default () => {
     return (
         <PageContentBlock className='flex flex-col h-full' title={t('under_maintenance')} showFlashKey={'dashboard'}>
             <div className='mx-auto my-auto'>
-                <div className='w-screen max-w-[28.125rem] pt-10'>
+                <div className='w-screen max-w-112.5 pt-10'>
                     <LogoContainer>
-                        <img src={logo} alt={name} className='h-[3rem]' />
+                        <img src={logo} alt={name} className='h-12' />
                     </LogoContainer>
                     <Card>
                         <SpinnerOverlay visible={isLoggingOut} />

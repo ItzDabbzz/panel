@@ -66,7 +66,7 @@ export default () => {
                             <GreyRowBox key={key.identifier} className={`flex items-center ${index > 0 ? 'mt-2' : ''}`}>
                                 <FaKey className='text-gray-300' />
                                 <div className='ml-4 flex-1 overflow-hidden'>
-                                    <p className='break-words text-sm'>{key.description}</p>
+                                    <p className='wrap-break-word text-sm'>{key.description}</p>
                                     <p className='text-2xs uppercase text-gray-300'>
                                         {t('api.last-used')}:&nbsp;
                                         {key.lastUsedAt
