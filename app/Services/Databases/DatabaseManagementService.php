@@ -98,20 +98,28 @@ class DatabaseManagementService
         ]);
 
         $database = null;
+        $createdDatabase = false;
+        $createdUser = false;
 
         try {
-            return $this->connection->transaction(function () use ($data, &$database, $plainPassword) {
+            return $this->connection->transaction(function () use ($data, &$database, &$createdDatabase, &$createdUser, $plainPassword) {
                 $database = $this->createModel($data);
 
                 $this->dynamic->set('dynamic', $data['database_host_id']);
 
-                $this->repository->createDatabase($database->database);
+                // Never adopt a database that already exists on the host, otherwise a later failure
+                // would drop a database (and its data) that this request never created.
+                $this->repository->createDatabase($database->database, false);
+                $createdDatabase = true;
+
                 $this->repository->createUser(
                     $database->username,
                     $database->remote,
                     $plainPassword,
                     $database->max_connections
                 );
+                $createdUser = true;
+
                 $this->repository->assignUserToDatabase($database->database, $database->username, $database->remote);
                 $this->repository->flush();
 
@@ -121,11 +129,14 @@ class DatabaseManagementService
             });
         } catch (\Exception $exception) {
             try {
-                // This is actually incorrect, it can be null in the case that the $database model
-                // itself isn't able to be created in Reviactyl's database.
-                if ($database instanceof Database) {
+                // Only remove what this request created on the host.
+                if ($database instanceof Database && $createdDatabase) {
                     $this->repository->dropDatabase($database->database);
-                    $this->repository->dropUser($database->username, $database->remote);
+
+                    if ($createdUser) {
+                        $this->repository->dropUser($database->username, $database->remote);
+                    }
+
                     $this->repository->flush();
                 }
             } catch (\Throwable $deletionException) {

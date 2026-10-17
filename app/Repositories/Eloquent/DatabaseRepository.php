@@ -66,11 +66,12 @@ class DatabaseRepository extends EloquentRepository implements DatabaseRepositor
     }
 
     /**
-     * Create a new database on a given connection.
+     * Create a new database on a given connection. When $ifNotExists is false the statement
+     * fails if the database already exists, rather than silently reusing it.
      */
-    public function createDatabase(string $database): bool
+    public function createDatabase(string $database, bool $ifNotExists = true): bool
     {
-        return $this->run(sprintf('CREATE DATABASE IF NOT EXISTS `%s`', $database));
+        return $this->run(sprintf($ifNotExists ? 'CREATE DATABASE IF NOT EXISTS `%s`' : 'CREATE DATABASE `%s`', $database));
     }
 
     /**
