@@ -122,7 +122,7 @@ class DatabaseManagementServiceTest extends IntegrationTestCase
 
         $host = DatabaseHost::factory()->create(['node_id' => $server->node_id]);
 
-        $this->repository->expects('createDatabase')->with($name);
+        $this->repository->expects('createDatabase')->with($name, false);
 
         $username = null;
         $secondUsername = null;
@@ -170,7 +170,7 @@ class DatabaseManagementServiceTest extends IntegrationTestCase
     }
 
     /**
-     * Test that an exception encountered while creating the database leads to the cleanup code
+     * Test that an exception encountered after the database is created leads to the cleanup code
      * being called and any exceptions encountered while cleaning up go unreported.
      */
     public function test_exception_encountered_while_creating_database_attempts_to_cleanup()
@@ -180,17 +180,84 @@ class DatabaseManagementServiceTest extends IntegrationTestCase
 
         $host = DatabaseHost::factory()->create(['node_id' => $server->node_id]);
 
-        $this->repository->expects('createDatabase')->with($name)->andThrows(new \BadMethodCallException());
+        $this->repository->expects('createDatabase')->with($name, false);
+        $this->repository->expects('createUser')->withAnyArgs();
+        $this->repository->expects('assignUserToDatabase')->withAnyArgs()->andThrows(new \BadMethodCallException());
         $this->repository->expects('dropDatabase')->with($name);
         $this->repository->expects('dropUser')->withAnyArgs()->andThrows(new \InvalidArgumentException());
 
-        $this->expectException(\BadMethodCallException::class);
+        try {
+            $this->getService()->create($server, [
+                'remote' => '%',
+                'database' => $name,
+                'database_host_id' => $host->id,
+            ]);
 
-        $this->getService()->create($server, [
-            'remote' => '%',
-            'database' => $name,
-            'database_host_id' => $host->id,
-        ]);
+            $this->fail('Expected database creation to fail.');
+        } catch (\BadMethodCallException) {
+        }
+
+        $this->assertDatabaseMissing('databases', ['server_id' => $server->id]);
+    }
+
+    /**
+     * Test that a database which already exists on the host is not dropped when creation fails,
+     * and that a user which was never created is not dropped either.
+     */
+    public function test_cleanup_does_not_drop_resources_it_did_not_create()
+    {
+        $server = $this->createServerModel();
+        $name = DatabaseManagementService::generateUniqueDatabaseName('restored', $server->id);
+
+        $host = DatabaseHost::factory()->create(['node_id' => $server->node_id]);
+
+        $this->repository->expects('createDatabase')->with($name, false)->andThrows(new \RuntimeException('Database exists'));
+        $this->repository->shouldNotReceive('createUser');
+        $this->repository->shouldNotReceive('dropDatabase');
+        $this->repository->shouldNotReceive('dropUser');
+
+        try {
+            $this->getService()->create($server, [
+                'remote' => '%',
+                'database' => $name,
+                'database_host_id' => $host->id,
+            ]);
+
+            $this->fail('Expected database creation to fail.');
+        } catch (\RuntimeException $exception) {
+            $this->assertSame('Database exists', $exception->getMessage());
+        }
+
+        $this->assertDatabaseMissing('databases', ['server_id' => $server->id]);
+    }
+
+    /**
+     * Test that a failure creating the user only drops the database this request created.
+     */
+    public function test_failed_user_creation_only_drops_created_database()
+    {
+        $server = $this->createServerModel();
+        $name = DatabaseManagementService::generateUniqueDatabaseName('something', $server->id);
+
+        $host = DatabaseHost::factory()->create(['node_id' => $server->node_id]);
+
+        $this->repository->expects('createDatabase')->with($name, false);
+        $this->repository->expects('createUser')->withAnyArgs()->andThrows(new \RuntimeException('Access denied'));
+        $this->repository->expects('dropDatabase')->with($name);
+        $this->repository->shouldNotReceive('dropUser');
+        $this->repository->expects('flush')->withNoArgs();
+
+        try {
+            $this->getService()->create($server, [
+                'remote' => '%',
+                'database' => $name,
+                'database_host_id' => $host->id,
+            ]);
+
+            $this->fail('Expected database creation to fail.');
+        } catch (\RuntimeException $exception) {
+            $this->assertSame('Access denied', $exception->getMessage());
+        }
 
         $this->assertDatabaseMissing('databases', ['server_id' => $server->id]);
     }

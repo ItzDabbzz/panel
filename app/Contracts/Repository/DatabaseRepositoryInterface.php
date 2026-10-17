@@ -30,9 +30,10 @@ interface DatabaseRepositoryInterface extends RepositoryInterface
     public function getDatabasesForHost(int $host, int $count = 25): LengthAwarePaginator;
 
     /**
-     * Create a new database on a given connection.
+     * Create a new database on a given connection. When $ifNotExists is false the statement
+     * fails if the database already exists, rather than silently reusing it.
      */
-    public function createDatabase(string $database): bool;
+    public function createDatabase(string $database, bool $ifNotExists = true): bool;
 
     /**
      * Create a new database user on a given connection.
