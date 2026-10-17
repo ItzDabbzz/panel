@@ -124,7 +124,9 @@ export default ({
                             )}
 
                             {!!server.description && (
-                                <p className='m-0 truncate wrap-break-word text-sm text-gray-300'>{server.description}</p>
+                                <p className='m-0 truncate wrap-break-word text-sm text-gray-300'>
+                                    {server.description}
+                                </p>
                             )}
                         </div>
                     </div>

@@ -172,10 +172,7 @@ const Announcement = ({ placement = 'dashboard', server }: Props) => {
                                     aria-hidden
                                     className='pointer-events-none absolute inset-0 bg-(--alert-accent) opacity-10'
                                 />
-                                <span
-                                    aria-hidden
-                                    className='absolute inset-y-0 left-0 w-1.5 bg-(--alert-accent)'
-                                />
+                                <span aria-hidden className='absolute inset-y-0 left-0 w-1.5 bg-(--alert-accent)' />
                                 <Icon
                                     aria-hidden
                                     className='relative mt-0.5 h-5 w-5 shrink-0 text-(--alert-accent) sm:mt-0'
