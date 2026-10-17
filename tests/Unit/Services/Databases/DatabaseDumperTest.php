@@ -96,7 +96,7 @@ class DatabaseDumperTest extends TestCase
             'SHOW CREATE FUNCTION `double_number`' => [1 => 'PIPES_AS_CONCAT,ANSI_QUOTES', 2 => 'CREATE DEFINER="root"@"%" FUNCTION double_number(n INT) RETURNS INT RETURN n * 2'],
             'SHOW CREATE PROCEDURE `read_numbers`' => [1 => 'ANSI_QUOTES', 2 => 'CREATE DEFINER="root"@"%" PROCEDURE read_numbers() SELECT double_number(n) FROM numbers'],
             'SHOW CREATE TRIGGER `numbers_trigger`' => [1 => '', 2 => 'CREATE TRIGGER numbers_trigger BEFORE INSERT ON numbers FOR EACH ROW SET NEW.n = double_number(NEW.n)'],
-            'SHOW CREATE EVENT `refresh_numbers`' => [1 => 'NO_BACKSLASH_ESCAPES', 3 => 'CREATE EVENT refresh_numbers ON SCHEDULE EVERY 1 DAY DO CALL read_numbers()'],
+            'SHOW CREATE EVENT `refresh_numbers`' => [1 => 'NO_BACKSLASH_ESCAPES', 2 => '+05:30', 3 => "CREATE EVENT refresh_numbers ON SCHEDULE EVERY 1 DAY STARTS '2026-01-01 12:00:00' DO CALL read_numbers()"],
         ];
         foreach ($definitions as $query => $definition) {
             $result = Mockery::mock(PDOStatement::class);
@@ -126,6 +126,10 @@ class DatabaseDumperTest extends TestCase
             $this->assertSame("SET SQL_MODE = '".$definitions[$query][1]."'", $statements[$index - 1]);
             $this->assertSame("SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO'", $statements[$index + 1]);
         }
+
+        $event = $position('SHOW CREATE EVENT `refresh_numbers`');
+        $this->assertSame("SET time_zone = '+05:30'", $statements[$event - 2]);
+        $this->assertSame("SET time_zone = '+00:00'", $statements[$event + 2]);
 
         $this->assertLessThan($position('SHOW CREATE VIEW `z_function_view`'), $position('SHOW CREATE FUNCTION `double_number`'));
         $this->assertLessThan($position('SHOW CREATE PROCEDURE `read_numbers`'), $position('SHOW CREATE FUNCTION `double_number`'));
