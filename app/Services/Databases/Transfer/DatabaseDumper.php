@@ -199,11 +199,37 @@ class DatabaseDumper
                 throw new \PDOException(sprintf('The definition of the %s %s could not be read.', strtolower($type), $name));
             }
 
+            // Events take their time zone from the session that creates them, and their
+            // definition shows STARTS and ENDS in that time zone.
+            $timeZone = $type === 'EVENT' ? $row[2] ?? null : null;
+            if (strtoupper((string) $timeZone) === 'SYSTEM') {
+                $timeZone = $this->systemTimeZone($connection);
+            }
+
             yield "DROP $type IF EXISTS ".$this->identifier($name);
+            if (! empty($timeZone)) {
+                yield 'SET time_zone = '.$this->string($timeZone);
+            }
             yield 'SET SQL_MODE = '.$this->string($row[1]);
             yield $this->withoutDefiner($definition);
             yield "SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO'";
+            if (! empty($timeZone)) {
+                yield "SET time_zone = '+00:00'";
+            }
         }
+    }
+
+    /**
+     * SYSTEM is the source server's time zone, which the server restoring the dump
+     * may not share, so it is written as that zone's current offset instead.
+     */
+    private function systemTimeZone(PDO $connection): string
+    {
+        $offset = (int) $connection->query(
+            "SELECT TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', 'SYSTEM'))"
+        )->fetchColumn();
+
+        return sprintf('%s%02d:%02d', $offset < 0 ? '-' : '+', intdiv(abs($offset), 3600), intdiv(abs($offset) % 3600, 60));
     }
 
     private function withoutDefiner(string $statement): string
