@@ -80,7 +80,7 @@ class DatabaseDumperTest extends TestCase
             'SHOW TRIGGERS' => ['numbers_trigger'],
             'SHOW PROCEDURE STATUS WHERE Db = DATABASE()' => ['read_numbers'],
             'SHOW FUNCTION STATUS WHERE Db = DATABASE()' => ['double_number'],
-            'SHOW EVENTS' => ['refresh_numbers'],
+            'SHOW EVENTS' => ['refresh_numbers', 'clear_numbers'],
             'SHOW COLUMNS FROM `numbers`' => [['Field' => 'n', 'Type' => 'int', 'Extra' => '']],
         ];
         foreach ($queries as $query => $rows) {
@@ -97,12 +97,17 @@ class DatabaseDumperTest extends TestCase
             'SHOW CREATE PROCEDURE `read_numbers`' => [1 => 'ANSI_QUOTES', 2 => 'CREATE DEFINER="root"@"%" PROCEDURE read_numbers() SELECT double_number(n) FROM numbers'],
             'SHOW CREATE TRIGGER `numbers_trigger`' => [1 => '', 2 => 'CREATE TRIGGER numbers_trigger BEFORE INSERT ON numbers FOR EACH ROW SET NEW.n = double_number(NEW.n)'],
             'SHOW CREATE EVENT `refresh_numbers`' => [1 => 'NO_BACKSLASH_ESCAPES', 2 => '+05:30', 3 => "CREATE EVENT refresh_numbers ON SCHEDULE EVERY 1 DAY STARTS '2026-01-01 12:00:00' DO CALL read_numbers()"],
+            'SHOW CREATE EVENT `clear_numbers`' => [1 => '', 2 => 'SYSTEM', 3 => "CREATE EVENT clear_numbers ON SCHEDULE EVERY 1 DAY STARTS '2026-01-01 12:00:00' DO DELETE FROM numbers"],
         ];
         foreach ($definitions as $query => $definition) {
             $result = Mockery::mock(PDOStatement::class);
             $result->shouldReceive('fetch')->andReturn($definition);
             $connection->shouldReceive('query')->with($query)->andReturn($result);
         }
+
+        $offset = Mockery::mock(PDOStatement::class);
+        $offset->shouldReceive('fetchColumn')->andReturn('-9000');
+        $connection->shouldReceive('query')->with("SELECT TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', 'SYSTEM'))")->andReturn($offset);
 
         $rows = Mockery::mock(PDOStatement::class);
         $rows->shouldReceive('fetch')->andReturn(['21'], false);
@@ -129,6 +134,10 @@ class DatabaseDumperTest extends TestCase
 
         $event = $position('SHOW CREATE EVENT `refresh_numbers`');
         $this->assertSame("SET time_zone = '+05:30'", $statements[$event - 2]);
+        $this->assertSame("SET time_zone = '+00:00'", $statements[$event + 2]);
+
+        $event = $position('SHOW CREATE EVENT `clear_numbers`');
+        $this->assertSame("SET time_zone = '-02:30'", $statements[$event - 2]);
         $this->assertSame("SET time_zone = '+00:00'", $statements[$event + 2]);
 
         $this->assertLessThan($position('SHOW CREATE VIEW `z_function_view`'), $position('SHOW CREATE FUNCTION `double_number`'));

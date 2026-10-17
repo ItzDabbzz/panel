@@ -202,6 +202,9 @@ class DatabaseDumper
             // Events take their time zone from the session that creates them, and their
             // definition shows STARTS and ENDS in that time zone.
             $timeZone = $type === 'EVENT' ? $row[2] ?? null : null;
+            if (strtoupper((string) $timeZone) === 'SYSTEM') {
+                $timeZone = $this->systemTimeZone($connection);
+            }
 
             yield "DROP $type IF EXISTS ".$this->identifier($name);
             if (! empty($timeZone)) {
@@ -214,6 +217,19 @@ class DatabaseDumper
                 yield "SET time_zone = '+00:00'";
             }
         }
+    }
+
+    /**
+     * SYSTEM is the source server's time zone, which the server restoring the dump
+     * may not share, so it is written as that zone's current offset instead.
+     */
+    private function systemTimeZone(PDO $connection): string
+    {
+        $offset = (int) $connection->query(
+            "SELECT TIMESTAMPDIFF(SECOND, UTC_TIMESTAMP(), CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', 'SYSTEM'))"
+        )->fetchColumn();
+
+        return sprintf('%s%02d:%02d', $offset < 0 ? '-' : '+', intdiv(abs($offset), 3600), intdiv(abs($offset) % 3600, 60));
     }
 
     private function withoutDefiner(string $statement): string
