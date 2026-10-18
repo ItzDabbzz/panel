@@ -20,8 +20,8 @@ const TitledGreyBox = ({ icon, title, children, className, showFlashes }: Props)
         <Card className={`p-0! ${className || ''}`}>
             <div className='p-3'>
                 {typeof title === 'string' ? (
-                    <Title className='text-sm'>
-                        {HeaderIcon && <HeaderIcon className={'mr-2 text-gray-300 inline-block'} />}
+                    <Title className='inline-flex items-center text-sm'>
+                        {HeaderIcon && <HeaderIcon className={'mr-1 h-3 text-gray-400'} />}
                         {title}
                     </Title>
                 ) : (

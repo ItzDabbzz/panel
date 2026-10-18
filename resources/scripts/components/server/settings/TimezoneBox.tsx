@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react';
 import { Actions, useStoreActions } from 'easy-peasy';
 import { useTranslation } from 'react-i18next';
-import { FaCheck, FaChevronDown } from 'react-icons/fa6';
+import { FaCheck, FaChevronDown, FaGlobe } from 'react-icons/fa6';
 import classNames from 'classnames';
 import { ServerContext } from '@/state/server';
 import { ApplicationStore } from '@/state';
@@ -107,7 +107,7 @@ export default () => {
     const canUseBrowserTimezone = browserTimezone !== null && browserTimezone !== selected;
 
     return (
-        <TitledGreyBox title={t('timezone.title')} className='relative'>
+        <TitledGreyBox icon={FaGlobe} title={t('timezone.title')} className='relative'>
             <SpinnerOverlay visible={isSubmitting} />
             <Label htmlFor={'server-timezone'}>{t('timezone.label')}</Label>
             <Combobox

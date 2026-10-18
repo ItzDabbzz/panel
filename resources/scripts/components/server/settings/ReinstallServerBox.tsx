@@ -8,6 +8,7 @@ import { httpErrorToHuman } from '@/api/http';
 import { Button } from '@/reviactyl/components/button/index';
 import { Dialog } from '@/reviactyl/elements/dialog';
 import { useTranslation } from 'react-i18next';
+import { FaAnchorLock, FaAnchor } from 'react-icons/fa6';
 
 export default () => {
     const { t } = useTranslation('server/settings');
@@ -40,14 +41,14 @@ export default () => {
 
     if (skipScripts) {
         return (
-            <TitledGreyBox title={'Reinstall Server'}>
+            <TitledGreyBox icon={FaAnchorLock} title={'Reinstall Server'}>
                 <p className='text-sm'>{t('reinstall.disabled')}</p>
             </TitledGreyBox>
         );
     }
 
     return (
-        <TitledGreyBox title={t('reinstall.title')} className='relative'>
+        <TitledGreyBox icon={FaAnchor} title={t('reinstall.title')} className='relative'>
             <Dialog.Confirm
                 open={modalVisible}
                 title={t('reinstall.confirm-title')}

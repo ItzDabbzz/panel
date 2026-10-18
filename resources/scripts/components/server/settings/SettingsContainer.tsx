@@ -14,6 +14,8 @@ import CopyOnClick from '@/reviactyl/elements/CopyOnClick';
 import { ip } from '@/lib/formatters';
 import { Button } from '@/reviactyl/components/button/index';
 import { useTranslation } from 'react-i18next';
+import { FaFolderOpen } from 'react-icons/fa';
+import { FaGaugeHigh } from 'react-icons/fa6';
 
 export default () => {
     const { t } = useTranslation('server/settings');
@@ -31,7 +33,7 @@ export default () => {
             <div className='flex flex-col gap-6 md:flex-row md:gap-10'>
                 <div className='flex w-full flex-col gap-6 md:flex-1 md:gap-10'>
                     <Can action={'file.sftp'}>
-                        <TitledGreyBox title={t('sftp.title')}>
+                        <TitledGreyBox icon={FaFolderOpen} title={t('sftp.title')}>
                             <div>
                                 <Label>{t('sftp.address')}</Label>
                                 <CopyOnClick text={`sftp://${ip(sftp.ip)}:${sftp.port}`}>
@@ -60,7 +62,7 @@ export default () => {
                             </div>
                         </TitledGreyBox>
                     </Can>
-                    <TitledGreyBox title={t('info.title')}>
+                    <TitledGreyBox icon={FaGaugeHigh} title={t('info.title')}>
                         <div className='flex items-center justify-between text-sm'>
                             <p>{t('info.node')}</p>
                             <code className='rounded-ui border border-gray-800 bg-gray-900 px-2 py-1 font-mono'>

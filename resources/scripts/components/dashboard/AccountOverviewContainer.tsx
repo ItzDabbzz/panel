@@ -26,6 +26,7 @@ import ArchiveFormatSwitcher from '@/components/dashboard/ArchiveFormatSwitcher'
 
 import SocialLoginsContainer from '@/components/dashboard/forms/SocialLoginsContainer';
 import { ExtensionSlot } from '@/extensions/ExtensionSlot';
+import { FaBrush, FaEnvelope, FaLock, FaShield } from 'react-icons/fa6';
 
 export default () => {
     const { t } = useTranslation('dashboard/account');
@@ -116,10 +117,10 @@ export default () => {
                         </div>
                     </Card>
                     <ExtensionSlot name='account:overview:column1:middle' />
-                    <TitledGreyBox title={t('overview.update-email')} showFlashes={'account:email'}>
+                    <TitledGreyBox icon={FaEnvelope} title={t('overview.update-email')} showFlashes={'account:email'}>
                         <UpdateEmailAddressForm />
                     </TitledGreyBox>
-                    <TitledGreyBox title={t('overview.customization')}>
+                    <TitledGreyBox icon={FaBrush} title={t('overview.customization')}>
                         <LanguageSwitcher />
                         <ThemeToggle />
                         <FileEditorSwitcher />
@@ -130,11 +131,11 @@ export default () => {
                 <div className={'flex flex-col gap-4'}>
                     <ExtensionSlot name='account:overview:column2:start' />
                     <SocialLoginsContainer />
-                    <TitledGreyBox title={t('overview.update-password')} showFlashes={'account:password'}>
+                    <TitledGreyBox icon={FaLock} title={t('overview.update-password')} showFlashes={'account:password'}>
                         <UpdatePasswordForm />
                     </TitledGreyBox>
                     <ExtensionSlot name='account:overview:column2:middle' />
-                    <TitledGreyBox title={t('overview.2fa-verification')}>
+                    <TitledGreyBox icon={FaShield} title={t('overview.2fa-verification')}>
                         <ConfigureTwoFactorForm />
                     </TitledGreyBox>
                     <ExtensionSlot name='account:overview:column2:end' />

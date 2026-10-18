@@ -13,6 +13,7 @@ import Label from '@/reviactyl/elements/Label';
 import FormikFieldWrapper from '@/reviactyl/elements/FormikFieldWrapper';
 import { Textarea } from '@/reviactyl/elements/Input';
 import { useTranslation } from 'react-i18next';
+import { FaEdit } from 'react-icons/fa';
 
 interface Values {
     name: string;
@@ -24,7 +25,7 @@ const RenameServerBox = () => {
     const { isSubmitting } = useFormikContext<Values>();
 
     return (
-        <TitledGreyBox title={t('rename.title')} className='relative'>
+        <TitledGreyBox icon={FaEdit} title={t('rename.title')} className='relative'>
             <SpinnerOverlay visible={isSubmitting} />
             <Form className='mb-0'>
                 <Field id={'name'} name={'name'} label={t('rename.name')} type={'text'} />
