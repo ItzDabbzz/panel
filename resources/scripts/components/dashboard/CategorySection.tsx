@@ -18,13 +18,7 @@ interface Props {
 
 export default ({ category, servers, showOnlyAdmin, showCategory = true, onCategoryChanged }: Props) => {
     const { t } = useTranslation('dashboard/index');
-    const storageKey = `server-category-${
-        category?.name
-            ?.toLowerCase()
-            .trim()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-|-$/g, '') ?? 'primary'
-    }`;
+    const storageKey = `server-category-${category?.uuid ?? 'primary'}`;
     const [open, setOpen] = useState(() => {
         if (typeof window === 'undefined') return true;
 
