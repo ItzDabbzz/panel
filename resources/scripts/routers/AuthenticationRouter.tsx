@@ -8,6 +8,7 @@ import { NotFound } from '@/reviactyl/elements/ScreenBlock';
 import { Navigate } from 'react-router-dom';
 import { useStoreState } from 'easy-peasy';
 import Announcement from '@/reviactyl/ui/Announcement';
+import RouteTransition from '@/reviactyl/elements/RouteTransition';
 
 export default () => {
     const navigate = useNavigate();
@@ -16,18 +17,20 @@ export default () => {
     return (
         <div className='flex flex-col min-h-screen h-full'>
             <Announcement placement='auth' />
-            <Routes>
-                <Route path='/login' element={<LoginContainer />} />
-                <Route
-                    path='/register'
-                    element={registrationEnabled ? <RegisterContainer /> : <Navigate to='/auth/login' replace />}
-                />
-                <Route path='/login/checkpoint' element={<LoginCheckpointContainer />} />
-                <Route path='/password' element={<ForgotPasswordContainer />} />
-                <Route path='/password/reset/:token' element={<ResetPasswordContainer />} />
-                <Route path='/checkpoint' />
-                <Route path='*' element={<NotFound onBack={() => navigate('/auth/login')} />} />
-            </Routes>
+            <RouteTransition>
+                <Routes>
+                    <Route path='/login' element={<LoginContainer />} />
+                    <Route
+                        path='/register'
+                        element={registrationEnabled ? <RegisterContainer /> : <Navigate to='/auth/login' replace />}
+                    />
+                    <Route path='/login/checkpoint' element={<LoginCheckpointContainer />} />
+                    <Route path='/password' element={<ForgotPasswordContainer />} />
+                    <Route path='/password/reset/:token' element={<ResetPasswordContainer />} />
+                    <Route path='/checkpoint' />
+                    <Route path='*' element={<NotFound onBack={() => navigate('/auth/login')} />} />
+                </Routes>
+            </RouteTransition>
         </div>
     );
 };

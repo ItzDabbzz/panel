@@ -30,6 +30,7 @@ import { useExtensionRoutes } from '@/extensions/useExtensionRoutes';
 import { useExtensions } from '@/extensions/useExtensions';
 import { resolveExtensionIcon } from '@/extensions/iconResolver';
 import { useSubuserPreview } from '@/context/SubuserPreviewContext';
+import RouteTransition from '@/reviactyl/elements/RouteTransition';
 
 interface NavItemProps {
     route: any;
@@ -321,38 +322,40 @@ export default function ServerRouter() {
                                             <Announcement placement='server' server={uuid} />
                                             <MaintenanceAlert />
 
-                                            <Routes location={location}>
-                                                {allRoutes
-                                                    .filter(routeAllowed)
-                                                    .map(({ route, permission, component: Component }) => (
-                                                        <Route
-                                                            key={route}
-                                                            path={route}
-                                                            element={
-                                                                <PermissionRoute permission={permission}>
-                                                                    <Spinner.Suspense>
-                                                                        <Component />
-                                                                    </Spinner.Suspense>
-                                                                </PermissionRoute>
-                                                            }
-                                                        />
-                                                    ))}
+                                            <RouteTransition>
+                                                <Routes location={location}>
+                                                    {allRoutes
+                                                        .filter(routeAllowed)
+                                                        .map(({ route, permission, component: Component }) => (
+                                                            <Route
+                                                                key={route}
+                                                                path={route}
+                                                                element={
+                                                                    <PermissionRoute permission={permission}>
+                                                                        <Spinner.Suspense>
+                                                                            <Component />
+                                                                        </Spinner.Suspense>
+                                                                    </PermissionRoute>
+                                                                }
+                                                            />
+                                                        ))}
 
-                                                {!session &&
-                                                    injectedRoutes.map(({ path, element, permission }) => (
-                                                        <Route
-                                                            key={`extension:${path}`}
-                                                            path={path}
-                                                            element={
-                                                                <PermissionRoute key={path} permission={permission}>
-                                                                    {element}
-                                                                </PermissionRoute>
-                                                            }
-                                                        />
-                                                    ))}
+                                                    {!session &&
+                                                        injectedRoutes.map(({ path, element, permission }) => (
+                                                            <Route
+                                                                key={`extension:${path}`}
+                                                                path={path}
+                                                                element={
+                                                                    <PermissionRoute key={path} permission={permission}>
+                                                                        {element}
+                                                                    </PermissionRoute>
+                                                                }
+                                                            />
+                                                        ))}
 
-                                                <Route path='*' element={<NotFound />} />
-                                            </Routes>
+                                                    <Route path='*' element={<NotFound />} />
+                                                </Routes>
+                                            </RouteTransition>
 
                                             {!session && (
                                                 <ExtensionSlot

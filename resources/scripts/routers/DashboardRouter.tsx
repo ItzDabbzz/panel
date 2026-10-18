@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Suspense } from 'react';
-import { useRoutes } from 'react-router-dom';
+import { useLocation, useRoutes } from 'react-router-dom';
 import Navigate from '@/reviactyl/components/Navigate';
 import DashboardContainer from '@/components/dashboard/DashboardContainer';
 import { NotFound } from '@/reviactyl/elements/ScreenBlock';
@@ -9,7 +9,6 @@ import routes from '@/routers/routes';
 import { RouterContainer } from '@/reviactyl/ui/RouterContainer';
 import { XIcon, MenuIcon, ExternalLinkIcon } from '@heroicons/react/solid';
 import { ContentContainer } from '@/reviactyl/ui/ContentContainer';
-import { motion } from 'framer-motion';
 import { Navbar, Sidebar } from '@/reviactyl/components/Layout';
 import { useStoreState } from 'easy-peasy';
 import Announcement from '@/reviactyl/ui/Announcement';
@@ -24,6 +23,7 @@ import { useExtensions } from '@/extensions/useExtensions';
 import { resolveExtensionIcon } from '@/extensions/iconResolver';
 import PasskeysContainer from '@/components/dashboard/PasskeysContainer';
 import { useSubuserPreview } from '@/context/SubuserPreviewContext';
+import RouteTransition from '@/reviactyl/elements/RouteTransition';
 
 interface Props {
     route: any;
@@ -148,6 +148,7 @@ function DashboardRouter() {
     const accountRootAdmin = useStoreState((state) => state.user.data?.rootAdmin);
     const injectedRoutes = useExtensionRoutes('dashboardRouter');
     const { session } = useSubuserPreview();
+    const location = useLocation();
     const rootAdmin = accountRootAdmin && !session;
 
     return (
@@ -173,50 +174,53 @@ function DashboardRouter() {
                                 className='fixed inset-0 z-30 bg-gray-900/40 backdrop-blur-xs transition-all duration-300 ease-in-out lg:hidden'
                             />
                         )}
-                        <motion.div
-                            initial={{ opacity: 1 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.15, ease: 'easeIn' }}
-                        >
+                        <div>
                             <Sidebar isOpen={isSidebarOpen}>
                                 <DashboardNavigation />
                             </Sidebar>
-                        </motion.div>
+                        </div>
                         <div className='w-full flex-1 overflow-y-auto'>
                             <Suspense fallback={<Spinner centered />}>
-                                {useRoutes([
-                                    {
-                                        path: '',
-                                        element: (
-                                            <>
-                                                {!session && <ExtensionSlot name='dashboard:router:above' />}
-                                                <Announcement />
-                                                <MaintenanceAlert />
-                                                <DashboardContainer />
-                                                {!session && <ExtensionSlot name='dashboard:router:below' />}
-                                            </>
-                                        ),
-                                    },
-                                    ...(!session ? routes.account : []).map(({ route, component: Component }) => ({
-                                        path: `/account/${route}`.replace('//', '/'),
-                                        element: (
-                                            <>
-                                                <Announcement placement='account' />
-                                                <Component />
-                                            </>
-                                        ),
-                                    })),
-                                    ...(!session
-                                        ? [
-                                              {
-                                                  path: '/passkey/*',
-                                                  element: <PasskeysContainer />,
-                                              },
-                                          ]
-                                        : []),
-                                    ...(!session ? injectedRoutes : []),
-                                    { path: '*', element: <NotFound /> },
-                                ])}
+                                <RouteTransition>
+                                    {useRoutes(
+                                        [
+                                            {
+                                                path: '',
+                                                element: (
+                                                    <>
+                                                        {!session && <ExtensionSlot name='dashboard:router:above' />}
+                                                        <Announcement />
+                                                        <MaintenanceAlert />
+                                                        <DashboardContainer />
+                                                        {!session && <ExtensionSlot name='dashboard:router:below' />}
+                                                    </>
+                                                ),
+                                            },
+                                            ...(!session ? routes.account : []).map(
+                                                ({ route, component: Component }) => ({
+                                                    path: `/account/${route}`.replace('//', '/'),
+                                                    element: (
+                                                        <>
+                                                            <Announcement placement='account' />
+                                                            <Component />
+                                                        </>
+                                                    ),
+                                                }),
+                                            ),
+                                            ...(!session
+                                                ? [
+                                                      {
+                                                          path: '/passkey/*',
+                                                          element: <PasskeysContainer />,
+                                                      },
+                                                  ]
+                                                : []),
+                                            ...(!session ? injectedRoutes : []),
+                                            { path: '*', element: <NotFound /> },
+                                        ],
+                                        location,
+                                    )}
+                                </RouteTransition>
                             </Suspense>
                         </div>
                     </ContentContainer>
