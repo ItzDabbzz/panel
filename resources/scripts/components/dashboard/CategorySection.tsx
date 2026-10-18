@@ -72,8 +72,8 @@ export default ({ category, servers, showOnlyAdmin, showCategory = true, onCateg
                                     className='inline-flex h-6 min-w-6 items-center justify-center rounded-full border px-2 text-xs font-semibold tabular-nums'
                                     style={{
                                         color: displayColor,
-                                        borderColor: `${displayColor}40`,
-                                        backgroundColor: `${displayColor}15`,
+                                        borderColor: `color-mix(in srgb, ${displayColor} 25%, transparent)`,
+                                        backgroundColor: `color-mix(in srgb, ${displayColor} 8%, transparent)`,
                                     }}
                                 >
                                     {servers.length}
