@@ -18,7 +18,36 @@ interface Props {
 
 export default ({ category, servers, showOnlyAdmin, showCategory = true, onCategoryChanged }: Props) => {
     const { t } = useTranslation('dashboard/index');
-    const [open, setOpen] = useState(true);
+    const storageKey = `server-category-${
+        category?.name
+            ?.toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '') ?? 'primary'
+    }`;
+    const [open, setOpen] = useState(() => {
+        if (typeof window === 'undefined') return true;
+
+        try {
+            return window.localStorage.getItem(storageKey) !== 'false';
+        } catch {
+            return true;
+        }
+    });
+
+    const toggleOpen = () => {
+        setOpen((prev) => {
+            const next = !prev;
+
+            try {
+                window.localStorage.setItem(storageKey, String(next));
+            } catch {
+                return next;
+            }
+
+            return next;
+        });
+    };
 
     if (servers.length === 0) return null;
 
@@ -28,7 +57,7 @@ export default ({ category, servers, showOnlyAdmin, showCategory = true, onCateg
         <div className='relative mb-3 overflow-hidden'>
             <button
                 className={`relative z-10 flex w-full cursor-pointer items-center justify-between px-5 py-4.5 text-left transition-colors duration-150 hover:bg-gray-800 bg-gray-900 border border-gray-800 ${open ? 'rounded-t-ui mb-2' : 'rounded-ui'}`}
-                onClick={() => setOpen(!open)}
+                onClick={toggleOpen}
             >
                 <div className='flex min-w-0 flex-1 items-center gap-3'>
                     <div className='flex items-center gap-2'>
