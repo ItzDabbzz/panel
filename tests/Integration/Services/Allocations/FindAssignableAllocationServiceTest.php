@@ -93,6 +93,7 @@ class FindAssignableAllocationServiceTest extends IntegrationTestCase
     public function test_exception_is_thrown_if_no_more_allocations_can_be_created_in_range()
     {
         $server = $this->createServerModel();
+        $server->allocation->update(['port' => 6007]);
         $server2 = $this->createServerModel([
             'node_id' => $server->node_id,
             'allocation_id' => Allocation::factory()->create([
