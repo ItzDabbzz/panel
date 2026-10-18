@@ -37,6 +37,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogo(config('app.logo', '/reviactyl/logo.png'))
             ->brandLogoHeight('3rem')
             ->favicon(config('app.favicon', '/favicons/favicon.ico'))
+            ->font('Poppins')
             ->colors([
                 'primary' => Color::Blue,
             ])
