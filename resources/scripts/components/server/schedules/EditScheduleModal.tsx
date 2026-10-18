@@ -116,7 +116,7 @@ const EditScheduleModal = ({ schedule }: Props) => {
                         </span>
                         .
                     </p>
-                    <div className='mt-6 bg-gray-900 border border-gray-900 shadow-inner p-4 rounded'>
+                    <div className='mt-6 bg-gray-800 border border-gray-700 shadow-inner p-4 rounded-ui'>
                         <Switch
                             name={'show_cheatsheet'}
                             description={'Show the cron cheatsheet for some examples.'}
@@ -130,14 +130,14 @@ const EditScheduleModal = ({ schedule }: Props) => {
                             </div>
                         )}
                     </div>
-                    <div className='mt-6 bg-gray-900 border border-gray-900 shadow-inner p-4 rounded'>
+                    <div className='mt-6 bg-gray-800 border border-gray-700 shadow-inner p-4 rounded-ui'>
                         <FormikSwitch
                             name={'onlyWhenOnline'}
                             description={'Only execute this schedule when the server is in a running state.'}
                             label={'Only When Server Is Online'}
                         />
                     </div>
-                    <div className='mt-6 bg-gray-900 border border-gray-900 shadow-inner p-4 rounded'>
+                    <div className='mt-6 bg-gray-800 border border-gray-700 shadow-inner p-4 rounded-ui'>
                         <FormikSwitch
                             name={'enabled'}
                             description={'This schedule will be executed automatically if enabled.'}

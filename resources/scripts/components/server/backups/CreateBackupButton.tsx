@@ -43,7 +43,7 @@ const ModalContent = ({ ...props }: RequiredModalProps) => {
                             as='select'
                             id='backup-format'
                             name='format'
-                            className='w-full appearance-none rounded-ui border border-gray-700 bg-gray-900 bg-none p-2 pr-10 text-gray-100'
+                            className='w-full appearance-none rounded-ui border border-gray-700 bg-gray-800 bg-none p-2 pr-10 text-gray-100'
                         >
                             <option value='tar.gz'>tar.gz</option>
                             <option value='zip'>zip</option>
@@ -60,7 +60,7 @@ const ModalContent = ({ ...props }: RequiredModalProps) => {
                     </FormikFieldWrapper>
                 </div>
                 <Can action={'backup.delete'}>
-                    <div className='mt-6 bg-gray-900 border border-gray-900 shadow-inner p-4 rounded'>
+                    <div className='mt-6 bg-gray-800 border border-gray-700 shadow-inner p-4 rounded-ui'>
                         <FormikSwitch name={'isLocked'} label={'Locked'} description={t('locked-description')} />
                     </div>
                 </Can>
