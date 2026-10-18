@@ -72,7 +72,7 @@ function Modal({
     return (
         <FadeTransition as={Fragment} show={render} duration='duration-150' appear={appear ?? true} unmount>
             <ModalMask
-                className='bg-gray-900/40 backdrop-blur-sm-xs transition-all duration-300 ease-in-out'
+                className='bg-gray-900/40 backdrop-blur-xs transition-all duration-300 ease-in-out'
                 onClick={(e: React.MouseEvent) => e.stopPropagation()}
                 onContextMenu={(e: React.MouseEvent) => e.stopPropagation()}
                 onMouseDown={(e: React.MouseEvent) => {
