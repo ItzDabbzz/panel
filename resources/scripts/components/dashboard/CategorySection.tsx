@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Server } from '@/api/server/getServer';
 import { ServerCategory } from '@/api/server/types';
 import { LayoutContainer, ServerLayout } from '@/components/dashboard/ServerLayout';
 import { ChevronDownIcon } from '@heroicons/react/solid';
 import { useTranslation } from 'react-i18next';
 import Card from '@/reviactyl/ui/Card';
+import { FaServer } from 'react-icons/fa6';
 
 interface Props {
     category: ServerCategory | null;
@@ -14,64 +16,108 @@ interface Props {
     onCategoryChanged?: () => void;
 }
 
-// Exact styles provided by user
 export default ({ category, servers, showOnlyAdmin, showCategory = true, onCategoryChanged }: Props) => {
     const { t } = useTranslation('dashboard/index');
-    const [open, setOpen] = useState(true);
+    const storageKey = `server-category-${category?.uuid ?? 'primary'}`;
+    const [open, setOpen] = useState(() => {
+        if (typeof window === 'undefined') return true;
+
+        try {
+            return window.localStorage.getItem(storageKey) !== 'false';
+        } catch {
+            return true;
+        }
+    });
+
+    const toggleOpen = () => {
+        setOpen((prev) => {
+            const next = !prev;
+
+            try {
+                window.localStorage.setItem(storageKey, String(next));
+            } catch {
+                return next;
+            }
+
+            return next;
+        });
+    };
 
     if (servers.length === 0) return null;
 
-    const categoryColor = category?.color || '#3b82f6';
-    const displayColor = category ? categoryColor : '#64748b';
-
+    const categoryColor = category?.color || 'var(--color-blue-500)';
+    const displayColor = category ? categoryColor : 'var(--color-gray-600)';
     return (
-        <Card className='relative mb-5 overflow-hidden p-0! transition'>
-            {/* LEFT ACCENT BAR */}
-            <div className='absolute top-0 left-0 h-full w-1' style={{ backgroundColor: displayColor }} />
-
-            {/* HEADER */}
+        <div className='relative mb-3 overflow-hidden'>
             <button
-                className='flex w-full cursor-pointer items-center justify-between px-5 py-4.5 text-left transition-all duration-150 hover:bg-gray-700'
-                onClick={() => setOpen(!open)}
+                className={`relative z-10 flex w-full cursor-pointer items-center justify-between px-5 py-4.5 text-left transition-colors duration-150 hover:bg-gray-800 bg-gray-900 border border-gray-800 ${open ? 'rounded-t-ui mb-2' : 'rounded-ui'}`}
+                onClick={toggleOpen}
             >
                 <div className='flex min-w-0 flex-1 items-center gap-3'>
-                    <div className='min-w-0'>
-                        <span className='font-medium' style={{ color: displayColor }}>
-                            {category ? category.name : t('categories.primary')}
+                    <div className='flex items-center gap-2'>
+                        <span
+                            className='inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border'
+                            style={{
+                                color: displayColor,
+                                borderColor: `${displayColor}40`,
+                                backgroundColor: `${displayColor}15`,
+                            }}
+                        >
+                            <FaServer className='h-6' />
                         </span>
-                        {category?.description && (
-                            <p className='mt-0.5 truncate text-xs text-[#94a3b8]' title={category.description}>
-                                {category.description}
-                            </p>
-                        )}
+                        <div className='min-w-0'>
+                            <span className='font-medium inline-flex gap-2' style={{ color: displayColor }}>
+                                {category ? category.name : t('categories.primary')}
+                                <span
+                                    className='inline-flex h-6 min-w-6 items-center justify-center rounded-full border px-2 text-xs font-semibold tabular-nums'
+                                    style={{
+                                        color: displayColor,
+                                        borderColor: `color-mix(in srgb, ${displayColor} 25%, transparent)`,
+                                        backgroundColor: `color-mix(in srgb, ${displayColor} 8%, transparent)`,
+                                    }}
+                                >
+                                    {servers.length}
+                                </span>
+                            </span>
+                            {category?.description && (
+                                <p className='mt-0.5 truncate text-xs text-gray-400' title={category.description}>
+                                    {category.description}
+                                </p>
+                            )}
+                        </div>
                     </div>
-                    <span
-                        className='ml-auto shrink-0 rounded-ui border px-2 py-1 text-xs'
-                        style={{ color: displayColor, borderColor: displayColor }}
-                    >
-                        {t('categories.servers-count', { count: servers.length })}
-                    </span>
                 </div>
 
-                <ChevronDownIcon className={`h-5 w-5 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+                <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.25, ease: 'easeInOut' }}>
+                    <ChevronDownIcon className='h-5 w-5 text-gray-400' />
+                </motion.div>
             </button>
-
-            {/* CONTENT */}
-            {open && (
-                <div className='border-t border-gray-600 p-4'>
-                    <LayoutContainer>
-                        {servers.map((server, index) => (
-                            <ServerLayout
-                                key={server.uuid}
-                                server={server}
-                                className={index > 0 ? 'mt-2' : undefined}
-                                onCategoryChanged={onCategoryChanged}
-                                showCategory={!showOnlyAdmin && showCategory}
-                            />
-                        ))}
-                    </LayoutContainer>
-                </div>
-            )}
-        </Card>
+            <AnimatePresence initial={false}>
+                {open && (
+                    <motion.div
+                        key='category-content'
+                        initial={{ height: 0, opacity: 0, y: -8 }}
+                        animate={{ height: 'auto', opacity: 1, y: 0 }}
+                        exit={{ height: 0, opacity: 0, y: -8 }}
+                        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                        className='overflow-hidden'
+                    >
+                        <Card className='overflow-hidden rounded-t-none! p-2!'>
+                            <LayoutContainer>
+                                {servers.map((server, index) => (
+                                    <ServerLayout
+                                        key={server.uuid}
+                                        server={server}
+                                        className={index > 0 ? 'mt-2' : undefined}
+                                        onCategoryChanged={onCategoryChanged}
+                                        showCategory={!showOnlyAdmin && showCategory}
+                                    />
+                                ))}
+                            </LayoutContainer>
+                        </Card>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
     );
 };

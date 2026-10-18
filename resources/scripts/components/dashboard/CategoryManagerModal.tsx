@@ -106,7 +106,6 @@ export default ({ visible, onDismissed, onCategoryChanged }: Props) => {
             </div>
 
             <div className='flex flex-col gap-8 lg:flex-row'>
-                {/* LEFT SECTION: CREATE/EDIT */}
                 <div className='min-w-0 flex-1'>
                     <div className='flex items-center gap-2 mb-5'>
                         <div className='bg-blue-500/10 p-2 rounded-ui'>
@@ -122,7 +121,7 @@ export default ({ visible, onDismissed, onCategoryChanged }: Props) => {
                         </h3>
                     </div>
 
-                    <Card className='bg-[#1e293b] border border-[#334155] rounded-2xl p-6 shadow-xs'>
+                    <Card>
                         <Formik
                             onSubmit={submit}
                             initialValues={{
@@ -204,7 +203,6 @@ export default ({ visible, onDismissed, onCategoryChanged }: Props) => {
                     </Card>
                 </div>
 
-                {/* RIGHT SECTION: ARRANGE */}
                 <div className='min-w-0 flex-1'>
                     <div className='flex items-center justify-between mb-5'>
                         <div className='flex items-center gap-2'>
@@ -242,7 +240,7 @@ export default ({ visible, onDismissed, onCategoryChanged }: Props) => {
                                                                 'flex flex-col items-start p-3.5 mb-3',
                                                                 'transition-colors duration-200',
                                                                 'cursor-grab active:cursor-grabbing',
-                                                                'bg-gray-900 border border-gray-800 rounded-ui',
+                                                                'bg-gray-800 border border-gray-700 rounded-ui',
                                                                 'sm:flex-row sm:items-center sm:justify-between',
                                                                 snapshot.isDragging ? 'shadow-lg shadow-black/40' : '',
                                                             ].join(' ')}
@@ -276,13 +274,9 @@ export default ({ visible, onDismissed, onCategoryChanged }: Props) => {
                                                                         e.stopPropagation();
                                                                         setEditingCategory(cat);
                                                                     }}
-                                                                    className={[
-                                                                        'p-2 rounded-lg border border-[#334155]',
-                                                                        'text-blue-400 cursor-pointer',
-                                                                        snapshot.isDragging
-                                                                            ? 'bg-[#475569]'
-                                                                            : 'bg-[#1e293b]',
-                                                                    ].join(' ')}
+                                                                    className={
+                                                                        'p-2 rounded-lg border border-blue-600/20 bg-blue-400/20 text-blue-400 cursor-pointer'
+                                                                    }
                                                                     title={t('categories.edit')}
                                                                 >
                                                                     <FaPen className='text-sm' />
@@ -294,13 +288,9 @@ export default ({ visible, onDismissed, onCategoryChanged }: Props) => {
                                                                         e.stopPropagation();
                                                                         handleDelete(cat.uuid);
                                                                     }}
-                                                                    className={[
-                                                                        'p-2 rounded-lg border border-[#334155]',
-                                                                        'text-red-400 cursor-pointer',
-                                                                        snapshot.isDragging
-                                                                            ? 'bg-[#475569]'
-                                                                            : 'bg-[#1e293b]',
-                                                                    ].join(' ')}
+                                                                    className={
+                                                                        'p-2 rounded-lg border border-danger/20 bg-danger/20 text-danger cursor-pointer'
+                                                                    }
                                                                     title={t('categories.delete')}
                                                                 >
                                                                     <FaTrash className='text-sm' />

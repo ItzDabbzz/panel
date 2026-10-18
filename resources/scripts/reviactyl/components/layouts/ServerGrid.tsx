@@ -111,14 +111,14 @@ export default ({
                                     style={
                                         server.category
                                             ? {
-                                                  backgroundColor: `${server.category.color || '#3b82f6'}20`,
-                                                  borderColor: server.category.color || '#3b82f6',
+                                                  backgroundColor: `color-mix(in srgb, ${server.category.color || '#3b82f6'} 20%, transparent)`,
+                                                  borderColor: `color-mix(in srgb, ${server.category.color || '#3b82f6'} 25%, transparent)`,
                                                   color: server.category.color || '#3b82f6',
                                               }
                                             : {
-                                                  backgroundColor: '#334155',
-                                                  borderColor: '#475569',
-                                                  color: '#94a3b8',
+                                                  backgroundColor: 'var(--color-gray-800)',
+                                                  borderColor: 'var(--color-gray-700)',
+                                                  color: 'var(--color-gray-400)',
                                               }
                                     }
                                 >
