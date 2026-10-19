@@ -79,7 +79,9 @@ export const SidebarModern = React.forwardRef<HTMLDivElement, SidebarProps>(({ c
             <div className='sticky bottom-0 z-10 border-t border-gray-800 bg-gray-900 p-3'>
                 {session ? (
                     <div className='flex min-w-0 items-center gap-3'>
-                        <FaEye className='h-5 w-5 shrink-0 text-amber-400' />
+                        <span className='flex rounded-full items-center justify-center bg-amber-900/50 border-amber-800/50 h-10 w-10'>
+                            <FaEye className='h-5 w-5 shrink-0 text-amber-400' />
+                        </span>
                         <div className='min-w-0'>
                             <p className='text-xs font-semibold text-gray-100'>{tUsers('preview.title')}</p>
                             <p className='truncate text-xs text-gray-400'>{session.subuserEmail}</p>
