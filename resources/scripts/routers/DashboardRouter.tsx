@@ -9,6 +9,7 @@ import routes from '@/routers/routes';
 import { RouterContainer } from '@/reviactyl/ui/RouterContainer';
 import { XIcon, MenuIcon, ExternalLinkIcon } from '@heroicons/react/solid';
 import { ContentContainer } from '@/reviactyl/ui/ContentContainer';
+import MobileBottomBar from '@/reviactyl/ui/MobileBottomBar';
 import { Navbar, Sidebar } from '@/reviactyl/components/Layout';
 import { useStoreState } from 'easy-peasy';
 import Announcement from '@/reviactyl/ui/Announcement';
@@ -144,6 +145,7 @@ const DashboardNavigation = () => {
  */
 function DashboardRouter() {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
+    const layoutType = useStoreState((state) => state.designify.data!.layoutType);
     const isUnderMaintenance = useStoreState((state) => state.designify.data?.isUnderMaintenance);
     const accountRootAdmin = useStoreState((state) => state.user.data?.rootAdmin);
     const injectedRoutes = useExtensionRoutes('dashboardRouter');
@@ -179,7 +181,9 @@ function DashboardRouter() {
                                 <DashboardNavigation />
                             </Sidebar>
                         </div>
-                        <div className='w-full flex-1 overflow-y-auto'>
+                        <div
+                            className={`w-full flex-1 overflow-y-auto ${layoutType === 'modern' ? 'pb-24 lg:pb-0' : ''}`}
+                        >
                             <Suspense fallback={<Spinner centered />}>
                                 <RouteTransition>
                                     {useRoutes(
@@ -224,6 +228,12 @@ function DashboardRouter() {
                             </Suspense>
                         </div>
                     </ContentContainer>
+                    {layoutType === 'modern' && (
+                        <MobileBottomBar
+                            sidebarOpen={isSidebarOpen}
+                            onShowSidebar={() => setSidebarOpen((open) => !open)}
+                        />
+                    )}
                 </RouterContainer>
             )}
         </>

@@ -19,6 +19,7 @@ import { Sidebar, Navbar } from '@/reviactyl/components/Layout';
 import { XIcon, MenuIcon, ExternalLinkIcon } from '@heroicons/react/solid';
 import { RouterContainer } from '@/reviactyl/ui/RouterContainer';
 import { ContentContainer } from '@/reviactyl/ui/ContentContainer';
+import MobileBottomBar from '@/reviactyl/ui/MobileBottomBar';
 import TopServerDetails from '@/components/server/TopServerDetails';
 import Announcement from '@/reviactyl/ui/Announcement';
 import MaintenanceAlert from '@/reviactyl/ui/MaintenanceAlert';
@@ -218,6 +219,7 @@ export default function ServerRouter() {
 
     const [error, setError] = useState('');
     const [isSidebarOpen, setSidebarOpen] = useState(false);
+    const layoutType = useStoreState((state) => state.designify.data!.layoutType);
 
     const id = ServerContext.useStoreState((state) => state.server.data?.id);
     const uuid = ServerContext.useStoreState((state) => state.server.data?.uuid);
@@ -286,7 +288,6 @@ export default function ServerRouter() {
                                     </button>
                                 </div>
                             </Navbar>
-
                             <ContentContainer>
                                 {isSidebarOpen && (
                                     <div
@@ -299,7 +300,9 @@ export default function ServerRouter() {
                                     <ServerNavigation />
                                 </Sidebar>
 
-                                <div className='w-full flex-1 overflow-y-auto'>
+                                <div
+                                    className={`w-full flex-1 overflow-y-auto ${layoutType === 'modern' ? 'pb-24 lg:pb-0' : ''}`}
+                                >
                                     <InstallListener />
                                     <TransferListener />
                                     <WebsocketHandler />
@@ -370,6 +373,12 @@ export default function ServerRouter() {
                                     )}
                                 </div>
                             </ContentContainer>
+                            {layoutType === 'modern' && (
+                                <MobileBottomBar
+                                    sidebarOpen={isSidebarOpen}
+                                    onShowSidebar={() => setSidebarOpen((open) => !open)}
+                                />
+                            )}
                         </>
                     )}
                 </RouterContainer>
