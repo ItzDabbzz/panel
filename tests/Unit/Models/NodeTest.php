@@ -24,6 +24,19 @@ class NodeTest extends TestCase
         }
     }
 
+    #[DataProvider('behindProxyConnectionAddresses')]
+    public function test_connection_address_respects_behind_proxy_flag(string $fqdn, string $scheme, int $daemonListen, bool $behindProxy, string $expected): void
+    {
+        $node = new Node([
+            'fqdn' => $fqdn,
+            'scheme' => $scheme,
+            'daemonListen' => $daemonListen,
+            'behind_proxy' => $behindProxy,
+        ]);
+
+        $this->assertSame($expected, $node->getConnectionAddress());
+    }
+
     #[DataProvider('overallocationLimits')]
     public function test_viability_honors_each_resource_limit(int|float|string $memoryOverallocation, int|float|string $diskOverallocation, int $memory, int $disk, bool $viable): void
     {
@@ -67,6 +80,18 @@ class NodeTest extends TestCase
             ['[2001:db8::1]', '[2001:db8::1]'],
             ['::1', '[::1]'],
             ['::ffff:192.0.2.1', '[::ffff:192.0.2.1]'],
+        ];
+    }
+
+    public static function behindProxyConnectionAddresses(): array
+    {
+        return [
+            'https without proxy keeps the daemon port' => ['node.example.com', 'https', 8443, false, 'https://node.example.com:8443'],
+            'http without proxy keeps the daemon port' => ['node.example.com', 'http', 8080, false, 'http://node.example.com:8080'],
+            'https behind proxy omits the daemon port' => ['node.example.com', 'https', 8443, true, 'https://node.example.com'],
+            'http behind proxy omits the daemon port' => ['node.example.com', 'http', 8080, true, 'http://node.example.com'],
+            'ipv6 without proxy keeps the daemon port' => ['2001:db8::1', 'https', 8080, false, 'https://[2001:db8::1]:8080'],
+            'ipv6 behind proxy omits the daemon port' => ['2001:db8::1', 'https', 8080, true, 'https://[2001:db8::1]'],
         ];
     }
 }

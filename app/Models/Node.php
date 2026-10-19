@@ -155,6 +155,13 @@ class Node extends Model implements Identifiable
             $host = '['.$host.']';
         }
 
+        // Nodes behind a proxy (e.g. Cloudflare) are reached on the default
+        // port for the scheme, so the internal daemon listen port must not be
+        // appended to the connection address.
+        if ($this->behind_proxy) {
+            return sprintf('%s://%s', $this->scheme, $host);
+        }
+
         return sprintf('%s://%s:%s', $this->scheme, $host, $this->daemonListen);
     }
 
